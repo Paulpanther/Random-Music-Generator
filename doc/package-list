@@ -1,0 +1,13 @@
+de.lep.rmg
+de.lep.rmg.model
+de.lep.rmg.model.helper
+de.lep.rmg.model.instruments
+de.lep.rmg.model.instruments.helper
+de.lep.rmg.model.notes
+de.lep.rmg.model.notes.helper
+de.lep.rmg.musicgen
+de.lep.rmg.out.midi
+de.lep.rmg.out.xml
+de.lep.rmg.view
+de.lep.rmg.view.menu
+de.lep.rmg.view.panels
