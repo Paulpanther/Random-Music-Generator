@@ -66,5 +66,6 @@ public class Controller {
 		window.setJMenuBar(menuBar);
 //		window.add(new SaveLoadPanel(song, player, gcP));
 		window.pack();
+		
 	}
 }
