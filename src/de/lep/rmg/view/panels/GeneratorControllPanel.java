@@ -26,6 +26,7 @@ import de.lep.rmg.out.midi.MidiPlayer;
 import de.lep.rmg.out.midi.SequenceGenerator;
 import de.lep.rmg.out.xml.XMLException;
 import de.lep.rmg.out.xml.XMLGenerator;
+import de.lep.rmg.view.IGeneratorPanel;
 import de.lep.rmg.view.ISongChangeObserver;
 import de.lep.rmg.view.ISongChanger;
 
@@ -36,7 +37,7 @@ import de.lep.rmg.view.ISongChanger;
  * Mit diesem {@link JPanel} kann der Nutzer die Startwerte des {@link SongConfig}
  * festlegen (z.B. Grundton, Musiḱinstrumente, ...) und den {@link MusicGenerator} starten.
  */
-public class GeneratorControllPanel extends JPanel implements ISongChanger{
+public class GeneratorControllPanel extends JPanel implements ISongChanger, IGeneratorPanel{
 	private static final long serialVersionUID = 1L;
 	//Beobachterliste
 	private ArrayList<ISongChangeObserver> observers;
@@ -398,6 +399,11 @@ public class GeneratorControllPanel extends JPanel implements ISongChanger{
 	@Override
 	public void removeSongChangeObserver(ISongChangeObserver sco) {
 		observers.remove(sco);
+	}
+
+	@Override
+	public void setGenerator(IMusicGenerator musicGen) {
+		this.musicGen = musicGen;
 	}
 	
 }
