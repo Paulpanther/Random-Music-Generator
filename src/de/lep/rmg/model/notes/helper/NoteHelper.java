@@ -3,6 +3,7 @@ package de.lep.rmg.model.notes.helper;
 import de.lep.rmg.model.notes.Chord;
 import de.lep.rmg.model.notes.INote;
 import de.lep.rmg.model.notes.Rest;
+import de.lep.rmg.model.notes.SChord;
 import de.lep.rmg.model.notes.SNote;
 import de.lep.rmg.out.xml.XMLGenerator;
 
@@ -175,7 +176,7 @@ public class NoteHelper {
 	
 	/**
 	 * Gibt den Intervall zwischen zwei Tönen zurück.<br>
-	 * Die Töne stehen hierbei in Halbtonschritten, das Intervall allerdings in Ganztonschritten.<br>
+	 * Die Töne stehen hierbei in Halbtonschritten, das Intervall allerdings in Intervalschritten.<br>
 	 * Prime: 0, Sekunde: 1, Terz: 2, ...<br>
 	 * Es können auch negative Intervalle entstehen, wenn tone2 kleiner als tone1 ist.<br>
 	 * Es wird nicht moduliert, dass heißt ein Oktavenintervall ergibt 7 und nicht 0.
@@ -225,5 +226,30 @@ public class NoteHelper {
 		interval += correct*7;
 		
 		return interval;				
+	}
+	
+	/**
+	 * Gibt zu einem Ton den Ton zurück, der zu ihm das angeforderte Interval hat
+	 * @param tone Ton, dem das Interval hinzugefügt wird
+	 * @param interval Das Interval, das aufaddiert wird. Darf auch negativ sein.<br>
+	 * 	0 = Prime; 1 = Sekunde; ...; 7 = Oktave
+	 * @param key Tonart, die zugrundegelegt wird
+	 * @return Tonhöhe des Intervals in Halbtonschritten
+	 */
+	public static int addInterval(int tone, int interval, SChord key){
+		int retTone = tone;
+		int[] scale = ChordHelper.getScale(key);
+		int octavechange = 0;//Änderung der Oktave
+		while(interval < 0){//Interval muss für Berechnung zwischen 0 und 6 liegen
+			interval += 7;
+			octavechange--;
+		}
+		while(interval > 6){
+			interval -= 7;
+			octavechange++;
+		}
+		retTone += scale[interval] - scale[0];//zählt das Interval zum Ursprungston hinzu
+		retTone += octavechange*12;//gleich die Oktave an
+		return retTone;
 	}
 }
