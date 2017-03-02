@@ -20,7 +20,7 @@ import de.lep.rmg.model.notes.helper.NoteHelper;
  *
  * @see MusicGenerator Controller für diese Klasse
  */
-public class MelodyGenerator {
+public class MelodyGenerator implements ICanonMelodyGenerator{
 	
 	/**
 	 * Minimum- und Maximum-Stufe.
@@ -55,7 +55,7 @@ public class MelodyGenerator {
 	 * @param config Die Konfiguration des Songs (s. {@link SongConfig})
 	 * @return Eine 3-dimensionale Liste von SNoten, die bereits den übergebenen Rhythmus haben. Siehe oben zur Struktur.
 	 */
-	static ArrayList<SNote>[][] generateMelodies( 
+	 public ArrayList<SNote>[][] generateMelodies( 
 			SChord key,
 			SChord[] schords,
 			ArrayList<Integer>[][] rhythm,
@@ -65,7 +65,7 @@ public class MelodyGenerator {
 		MChord[] chords = MChord.toMChords( schords );//SChord zu MChord
 		
 		@SuppressWarnings("unchecked")//Vorbereitung
-		ArrayList<Integer>[][] melody = new ArrayList[ config.getMelodyNr() ][ schords.length ];//Diese Liste at die gleiche Struktur wie in der Methoden-Dokumentation beschrieben, nur mit Tönen statt Noten
+		ArrayList<Integer>[][] melody = new ArrayList[ config.getMelodyNr() ][ schords.length ];//Diese Liste hat die gleiche Struktur wie in der Methoden-Dokumentation beschrieben, nur mit Tönen statt Noten
 		int[][] firstTones = new int[ config.getMelodyNr() ][ schords.length ];//Anfangstöne der Akkordmelodieen
 		Random rand = new Random();
 		
@@ -135,17 +135,26 @@ public class MelodyGenerator {
 			}//Ende Akkordmelodie-Generierung
 		}
 		
+		return intsToNotes(melody, rhythm);//fügt Tonhöhen und -dauern zusammen und gint sie zurück
+	}
+	
+	 /**
+	  * Vereint die Listen der Tonhöhen und die der Notendauern zu einem Listenarray von SNoten
+	  * @param tones Tonhöhen
+	  * @param rhythm Notendauern
+	  * @return die Melodie die sich aus beidem ergibt
+	  */
+	public static ArrayList<SNote>[][] intsToNotes(ArrayList<Integer>[][] tones, ArrayList<Integer>[][] rhythm){
 		@SuppressWarnings("unchecked")//Fügt zur Melodie den Rhythmus hinzu (Ton + Dauer = Note)
-		ArrayList<SNote>[][] realMelody = new ArrayList[ melody.length ][ chords.length ];
-		for( int m = 0; m < melody.length; m++ ) {
-			for( int c = 0; c < chords.length; c++ ) {
-				realMelody[ m ][ c ] = new ArrayList<SNote>();
-				for( int n = 0; n < melody[ m ][ c ].size(); n++ )
-					realMelody[ m ][ c ].add( new SNote( melody[ m ][ c ].get( n ), 4, rhythm[ m ][ c ].get( n ) ) );
+		ArrayList<SNote>[][] melody = new ArrayList[ tones.length ][ tones[0].length ];
+		for( int m = 0; m < tones.length; m++ ) {
+			for( int c = 0; c < tones[m].length; c++ ) {
+				melody[ m ][ c ] = new ArrayList<SNote>();
+				for( int n = 0; n < tones[ m ][ c ].size(); n++ )
+					melody[ m ][ c ].add( new SNote( tones[ m ][ c ].get( n ), 4, rhythm[ m ][ c ].get( n ) ) );
 			}
 		}
-		
-		return realMelody;
+		return melody;
 	}
 	
 	/**
@@ -285,5 +294,10 @@ public class MelodyGenerator {
 		PercentPair[] pp = new PercentPair[intervals.size()];
 		ret = PercentPair.getRandomValue( intervals.toArray(pp), new Random());
 		return ret;
+	}
+
+	@Override
+	public String getGeneratorName() {
+		return "classic";
 	}
 }

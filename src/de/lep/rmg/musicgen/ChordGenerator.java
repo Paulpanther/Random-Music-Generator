@@ -26,7 +26,7 @@ public class ChordGenerator {
 	static SChord[] generateChords( SChord key, int length ) {
 		SChord[] chords = new SChord[ length ];
 		
-		//Array aus Tonleiterposition der Tonika, Subdominante, Dominante und parallele Akkorden
+		//Array aus Tonleiterposition der Tonika, Subdominante, Dominante und parallelen Akkorden
 		int[] all = getAllChordsOf( key );
 		
 		Random r = new Random();
