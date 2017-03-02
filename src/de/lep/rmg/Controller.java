@@ -1,6 +1,7 @@
 package de.lep.rmg;
 
 import java.awt.FlowLayout;
+import java.util.ArrayList;
 //import java.io.File;
 
 //import javax.sound.midi.Sequence;
@@ -16,11 +17,13 @@ import de.lep.rmg.model.notes.helper.ChordHelperTest;
 import de.lep.rmg.model.notes.helper.NoteHelper;
 import de.lep.rmg.model.notes.helper.NoteHelperTest;
 import de.lep.rmg.musicgen.ChordGenerator;
+import de.lep.rmg.musicgen.IMusicGenerator;
 import de.lep.rmg.musicgen.MelodyGenerator;
 //import de.lep.rmg.model.Song;
 //import de.lep.rmg.model.SongConfig;
 import de.lep.rmg.musicgen.MusicGenerator;
 import de.lep.rmg.musicgen.RhythmGenerator;
+import de.lep.rmg.musicgen.markow.MarkowCanonMelodyGenerator;
 import de.lep.rmg.out.midi.MidiPlayer;
 import de.lep.rmg.out.midi.TrackFactory;
 import de.lep.rmg.out.xml.XMLGenerator;
@@ -29,6 +32,7 @@ import de.lep.rmg.out.xml.XMLGenerator;
 //import de.lep.rmg.out.xml.XMLGenerator;
 import de.lep.rmg.view.Window;
 import de.lep.rmg.view.menu.FileMenu;
+import de.lep.rmg.view.menu.GeneratorMenu;
 import de.lep.rmg.view.panels.GeneratorControllPanel;
 import de.lep.rmg.view.panels.PlayerControllPanel;
 
@@ -52,20 +56,30 @@ public class Controller {
 
 	public static void main( String[] args ) {
 		
-		// makes a MidiPlayer and a MusicGenerator for later use
+		// makes a MidiPlayer and MusicGenerators for later use
 		MidiPlayer player = new MidiPlayer();
-		MusicGenerator gen = new MusicGenerator();
+		ArrayList<IMusicGenerator> musicGenList = new ArrayList<IMusicGenerator>();
+		IMusicGenerator gen1 = new MusicGenerator(new MelodyGenerator());//MusicGenerator mit standard MelodyGenerator
+		IMusicGenerator gen2 = new MusicGenerator(new MarkowCanonMelodyGenerator());//MusicGenerator mit MarkowMelodyGenerator
+		musicGenList.add(gen1);
+		musicGenList.add(gen2);
 		
 		//creates a new window and adds the standard components for this programm
 		Window window = new Window(new FlowLayout(), player);
-		GeneratorControllPanel gcP = new GeneratorControllPanel(gen, player, 3);//GeneratorControllPanel with 3 Instruments to choose
+		
+		//Panels
+		GeneratorControllPanel gcP = new GeneratorControllPanel(gen1, player, 3);//GeneratorControllPanel with 3 Instruments to choose
 		window.add(gcP);
 		window.add(new PlayerControllPanel(player));
+//		window.add(new SaveLoadPanel(song, player, gcP));
+		
+		//MenuLeiste
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.add(new FileMenu(/*song*/ null, player, gcP));
+		menuBar.add(new GeneratorMenu(gcP, musicGenList));
 		window.setJMenuBar(menuBar);
-//		window.add(new SaveLoadPanel(song, player, gcP));
-		window.pack();
 		
+		//stellt Fenster fertig
+		window.pack();
 	}
 }
