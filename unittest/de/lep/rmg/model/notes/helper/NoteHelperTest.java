@@ -34,12 +34,12 @@ public class NoteHelperTest {
 	@Test
 	public void testAddInterval() {
 		assertEquals( SNote.A, NoteHelper.addInterval( SNote.A, 0, new SChord(SNote.G, CType.MAJOR) );
-		assertEquals( SNote.E + 12 , NoteHelper.addInterval( SNote.B, 3, new SChord(SNote.D, CType.MINOR)));
+		assertEquals( SNote.E + 12 , NoteHelper.addInterval( SNote.AIS, 3, new SChord(SNote.D, CType.MINOR)));
 		assertEquals( SNote.DIS, NoteHelper.addInterval( SNote.G, -2, new SChord(SNote.C, CType.MINOR)));
 		assertEquals( SNote.AIS, NoteHelper.addInterval( SNote.G, 2, new SChord(SNote.A, CType.DIM)));
 		assertEquals( SNote.C - 12, NoteHelper.addInterval( SNote.D, -8, new SChord(SNote.A, CType.MINOR)));
 		assertEquals( SNote.GIS + 24, NoteHelper.addInterval( SNote.D, 17, new SChord(SNote.C, CType.AUG)));
-		assertEquals( SNote.B, NoteHelper.addInterval( SNote.E, 4, new SChord(SNote.F, CType.MAJOR)));
+		assertEquals( SNote.AIS, NoteHelper.addInterval( SNote.E, 4, new SChord(SNote.F, CType.MAJOR)));
 		assertEquals( SNote.D, NoteHelper.addInterval(SNote.B, -5, new SChord(SNote.D, CType.MINOR)));
 	}
 	
