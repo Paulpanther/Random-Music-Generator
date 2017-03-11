@@ -24,4 +24,10 @@ public interface IMusicGenerator {
 	 * @return Der Typ des Songs
 	 */
 	public String getSongType();
+	
+	/**
+	 * Gibt den Namen des Generators zurück. Wird im GUI verwendet.
+	 * @return Name des MusicGenerators
+	 */
+	public String getGeneratorName();
 }
