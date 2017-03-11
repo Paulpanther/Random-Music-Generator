@@ -19,7 +19,7 @@ public enum CType {
 	MINOR,
 	
 	/**
-	 * Erhöht
+	 * Übermäßig
 	 */
 	AUG,
 	

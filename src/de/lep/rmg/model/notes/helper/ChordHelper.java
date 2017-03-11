@@ -143,7 +143,23 @@ public class ChordHelper {
 			scale[ 4 ] = keynote += 2;
 			scale[ 5 ] = keynote += 1;
 			scale[ 6 ] = keynote += 2;
-		} else
+		} else if( type == CType.AUG) {
+			scale[ 0 ] = keynote;
+			scale[ 1 ] = keynote += 2;
+			scale[ 2 ] = keynote += 2;
+			scale[ 3 ] = keynote += 2;
+			scale[ 4 ] = keynote += 2;
+			scale[ 5 ] = keynote += 1;
+			scale[ 6 ] = keynote += 2;
+		}else if( type == CType.DIM) {
+			scale[ 0 ] = keynote;
+			scale[ 1 ] = keynote += 1;
+			scale[ 2 ] = keynote += 2;
+			scale[ 3 ] = keynote += 2;
+			scale[ 4 ] = keynote += 1;
+			scale[ 5 ] = keynote += 2;
+			scale[ 6 ] = keynote += 2;
+		}else
 			throw new IllegalArgumentException( "Invalid Chord-Type" );
 		return scale;
 	}
