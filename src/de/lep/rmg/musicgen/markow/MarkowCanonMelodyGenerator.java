@@ -10,6 +10,7 @@ import de.lep.rmg.model.notes.SNote;
 import de.lep.rmg.model.notes.helper.NoteHelper;
 import de.lep.rmg.musicgen.ICanonMelodyGenerator;
 import de.lep.rmg.musicgen.MelodyGenerator;
+import de.lep.rmg.musicgen.helper.MelodyHelper;
 
 
 public class MarkowCanonMelodyGenerator implements ICanonMelodyGenerator {
@@ -79,7 +80,7 @@ public class MarkowCanonMelodyGenerator implements ICanonMelodyGenerator {
 			
 		}
 		
-		return MelodyGenerator.intsToNotes(tones, rhythm);
+		return MelodyHelper.intsToNotes(tones, rhythm);
 	}
 	
 	/**
