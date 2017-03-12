@@ -16,8 +16,12 @@ import de.lep.rmg.model.notes.SNote;
  *
  */
 public class MusicGenerator implements IMusicGenerator {
+	
+	ICanonMelodyGenerator melGen;
 
-	public MusicGenerator() {}
+	public MusicGenerator(ICanonMelodyGenerator melGen) {
+		this.melGen = melGen;
+	}
 	
 	/**
 	 * Generiert einen {@link Song} mithilfe des {@link ChordGenerator}s, {@link RhythmGenerator}s und {@link MelodyGenerator}s
@@ -49,7 +53,7 @@ public class MusicGenerator implements IMusicGenerator {
 		ArrayList<Integer>[][] rhythm = RhythmGenerator.generateRhythm( config );
 		//Generiert Melodien
 		//Array-Struktur: Alle Melodien / Nur eine Melodie aus mehreren Akkordmelodien / Akkordmelodie aus mehreren Noten (mit Rhythmus) / SNote
-		ArrayList<SNote>[][] melody = MelodyGenerator.generateMelodies( key, chords, rhythm, config );
+		ArrayList<SNote>[][] melody = melGen.generateMelodies( key, chords, rhythm, config );
 		
 		//Vorbereitung für Anordnung
 		int width = config.getChordDuration() * config.getChordNr() / 4;//Die Anzahl an Takten, die eine Melodie lang ist
@@ -104,12 +108,19 @@ public class MusicGenerator implements IMusicGenerator {
 			song.add( part );
 		}
 		
-		//System.out.println( song.toString() );
+		System.out.println( song.toString() );
 		return song;
 	}
 
 	@Override
 	public String getSongType() {
 		return "Kanon";
+	}
+	
+	@Override
+	public String getGeneratorName() {
+		String name = "Kanon ";
+		name += melGen.getGeneratorName();
+		return name;
 	}
 }

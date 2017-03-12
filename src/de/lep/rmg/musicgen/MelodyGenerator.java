@@ -13,6 +13,7 @@ import de.lep.rmg.model.notes.SChord;
 import de.lep.rmg.model.notes.SNote;
 import de.lep.rmg.model.notes.helper.ChordHelper;
 import de.lep.rmg.model.notes.helper.NoteHelper;
+import de.lep.rmg.musicgen.helper.MelodyHelper;
 
 /**
  * Was der Name sagt: Generiert Melodien<br>
@@ -20,7 +21,7 @@ import de.lep.rmg.model.notes.helper.NoteHelper;
  *
  * @see MusicGenerator Controller für diese Klasse
  */
-public class MelodyGenerator {
+public class MelodyGenerator implements ICanonMelodyGenerator{
 	
 	/**
 	 * Minimum- und Maximum-Stufe.
@@ -55,12 +56,18 @@ public class MelodyGenerator {
 	 * @param config Die Konfiguration des Songs (s. {@link SongConfig})
 	 * @return Eine 3-dimensionale Liste von SNoten, die bereits den übergebenen Rhythmus haben. Siehe oben zur Struktur.
 	 */
-	static ArrayList<SNote>[][] generateMelodies( SChord key, SChord[] schords, ArrayList<Integer>[][] rhythm, SongConfig config ) {
+	 public ArrayList<SNote>[][] generateMelodies( 
+			SChord key,
+			SChord[] schords,
+			ArrayList<Integer>[][] rhythm,
+			SongConfig config
+			) {
+		
 		MChord[] chords = MChord.toMChords( schords );//SChord zu MChord
 		
 		@SuppressWarnings("unchecked")//Vorbereitung
-		ArrayList<Integer>[][] melody = new ArrayList[ config.getMelodyNr() ][ schords.length ];//Diese Liste at die gleiche Struktur wie in der Methoden-Dokumentation beschrieben, nur mit Tönen statt Noten
-		int[][] firstTones = new int[ config.getMelodyNr() ][ schords.length ];
+		ArrayList<Integer>[][] melody = new ArrayList[ config.getMelodyNr() ][ schords.length ];//Diese Liste hat die gleiche Struktur wie in der Methoden-Dokumentation beschrieben, nur mit Tönen statt Noten
+		int[][] firstTones = new int[ config.getMelodyNr() ][ schords.length ];//Anfangstöne der Akkordmelodieen
 		Random rand = new Random();
 		
 		int previous = RandomHelper.randFrom( chords[ 0 ].getAvailableTones(), rand );//Zufälliger vorheriger Ton (Wird nicht gespielt)
@@ -89,13 +96,13 @@ public class MelodyGenerator {
 				int count = rhythm[ m ][ c ].size() -1;//count ist die Anzahl an folgenden Tönen die gesetzt werden sollen
 				
 				for( int n = 0; n < count; n++ ) {//Setzt folgende Töne
-					int allowD = ( count - n ) * 5;//Die erlaubte Intervall-Distanz von dem nächsten Anfangston (Garantiert, dass alle Töne zwischen Anfangston und nächstem Anfangston die Intervall-Schritte einhalten)
+					int allowDistance = ( count - n ) * 5;//Die erlaubte Intervall-Distanz von dem nächsten Anfangston (Garantiert, dass alle Töne zwischen Anfangston und nächstem Anfangston die Intervall-Schritte einhalten)
 					previous = chordMelody.get( chordMelody.size() -1 );//Der vorherige Ton
-					int[] allowed = getAllowedTones( previous, key );//Die von den Intervallen her erlaubten Töne
+					int[] allowed = getAllowedTones( previous, key, config );//Die von den Intervallen her erlaubten Töne
 					
 					List<Integer> realAllow = new ArrayList<Integer>();
-					for( int allow : allowed ) {//Berechnet mit allowD die tatsächlich erlaubten Töne
-						if( Math.abs( allow - next ) <= allowD )
+					for( int allow : allowed ) {//Berechnet mit allowDistance die tatsächlich erlaubten Töne
+						if( Math.abs( allow - next ) <= allowDistance )
 							realAllow.add( allow );
 					}
 					
@@ -113,10 +120,10 @@ public class MelodyGenerator {
 						if( allowedInThree.size() == 0 )//Falls es keine Töne gibt, welche zum Dreiklang gehören, werden wieder normale ausgewählt
 							note = realAllow.get( rand.nextInt( realAllow.size() ) );//Zufälliger Ton wird ausgewählt
 						else//Nur Töne des Dreiklangs werden ausgewählt
-							note = allowedInThree.get( rand.nextInt( allowedInThree.size() ) );//Zufälliger des Dreiklangs Ton wird ausgewählt
+							note = chooseNextTone(previous, allowedInThree, config);//Zufälliger des Dreiklangs Ton wird ausgewählt
 						
 					} else//Ohne Dreiklang ist erlaubt
-						note = realAllow.get( rand.nextInt( realAllow.size() ) );//Zufälliger Ton wird ausgewählt
+						note = chooseNextTone(previous, realAllow, config);//Zufälliger Ton wird ausgewählt
 					
 					chordMelody.add( note );//wird zur Akkordmelodie hinzugefügt
 				}
@@ -129,17 +136,7 @@ public class MelodyGenerator {
 			}//Ende Akkordmelodie-Generierung
 		}
 		
-		@SuppressWarnings("unchecked")//Fügt zur Melodie den Rhythmus hinzu (Ton + Dauer = Note)
-		ArrayList<SNote>[][] realMelody = new ArrayList[ melody.length ][ chords.length ];
-		for( int m = 0; m < melody.length; m++ ) {
-			for( int c = 0; c < chords.length; c++ ) {
-				realMelody[ m ][ c ] = new ArrayList<SNote>();
-				for( int n = 0; n < melody[ m ][ c ].size(); n++ )
-					realMelody[ m ][ c ].add( new SNote( melody[ m ][ c ].get( n ), 4, rhythm[ m ][ c ].get( n ) ) );
-			}
-		}
-		
-		return realMelody;
+		return MelodyHelper.intsToNotes(melody, rhythm);//fügt Tonhöhen und -dauern zusammen und gint sie zurück
 	}
 	
 	/**
@@ -148,12 +145,12 @@ public class MelodyGenerator {
 	 * 
 	 * @param previous Der vorherige Anfangston in Halbtonschritten
 	 * @param chord Der Akkord der Akkordmelodie als {@link MChord}
-	 * @param r {@link Random}
+	 * @param rand {@link Random}
 	 * @param config Die Song-Konfiguration für die Interval-Wahrscheinlichkeiten ({@link SongConfig})
 	 * @return Ein Integer-Wert welcher den Ton repräsentiert (Halbtonschritte)
 	 */
-	private static int getNewTone( int previous, MChord chord, Random r, SongConfig config ) {
-		return getNewTone(previous, chord, r, config, 0 );
+	private static int getNewTone( int previous, MChord chord, Random rand, SongConfig config ) {
+		return getNewTone(previous, chord, rand, config, 0 );
 	}
 	
 	/**
@@ -167,12 +164,12 @@ public class MelodyGenerator {
 	 * 
 	 * @param previous Der vorheriger Anfangston in Halbtonschritten
 	 * @param chord Der Akkord der Akkordmelodie als {@link MChord}
-	 * @param r {@link Random}
+	 * @param rand {@link Random}
 	 * @param config Die Song-Konfiguration für die Intervall-Wahrscheinlichkeiten ({@link SongConfig})
 	 * @param counter Zähler der StackOverflow verhindert. Für Debug-Zwecke
 	 * @return Ein Integer-Wert welcher den Ton repräsentiert (Halbtonschritte)
 	 */
-	private static int getNewTone( int previous, MChord chord, Random r, SongConfig config, int counter ) {
+	private static int getNewTone( int previous, MChord chord, Random rand, SongConfig config, int counter ) {
 		int[] available = chord.getAvailableTones();//Alle verfügbaren Töne
 		
 		int[] tones = new int[ available.length * 3 ];//Nimmt zusätzlich noch die Töne eine Oktave höher/tiefer
@@ -184,34 +181,35 @@ public class MelodyGenerator {
 		
 		List<Integer> allowed_tones = new ArrayList<Integer>();//Töne die zwischen den MIN- und MAX-Werten liegen und ein erlaubtes Intervall zu dem vorherigen Ton haben
 		for( int i = 0; i < tones.length; i++ ) {
-			int interval = NoteHelper.getInterval( previous, tones[ i ] );//Gibt das Intervall zwischen den beiden Tönen zurück
-			if( tones[ i ] >= MIN && tones[ i ] <= MAX && ArrayHelper.isIn( interval, new int[]{ -4, -2, -1, 0, 1, 2, 4 } ) )//Prüft
+			ArrayList<Integer> possibleIntervals = new ArrayList<Integer>();//im SongConfig erlaubte Intervalle
+			for(PercentPair ppinterval: config.getIntervals()){
+				possibleIntervals.add( ppinterval.getValue() );
+				if(ppinterval.getValue() != 0)
+					possibleIntervals.add( 0 - ppinterval.getValue() );
+			}
+			if( tones[ i ] >= MIN && tones[ i ] <= MAX && possibleIntervals.contains(tones[i]) )//Prüft
 				allowed_tones.add( tones[ i ] );//Erlaubte Töne werden hinzugefügt
 		}
 		
 		if( allowed_tones.size() == 0 && counter == 0 ) {//Wenn es keine erlaubten Töne für diesen Akkord mehr gibt wird MChord#reset() aufgerufen
 			chord.reset();
-			return getNewTone( previous, chord, r, config, 1 );
+			return getNewTone( previous, chord, rand, config, 1 );
 		} else if( allowed_tones.size() == 0 && counter > 0 )//Falls dies trotz Reset nochmals auftritt, wird eine NullPointerException geworfen, da kein Ton generiert werden kann.
 			throw new NullPointerException( "Error: Could not generate Note (in MelodyGenerator.getNewNote)" );//Dies wird nur für Debug-Zwecke beibehalten, im lauffähigen Programm tritt dieser Fehler nie auf.
 		
+		if(allowed_tones.size() == 1){//falls nur ein Ton erlaubt ist, wird er sofort zurückgegeben
+			return allowed_tones.get(0);
+		}
+		
 		List<PercentPair> percent_tones = new ArrayList<PercentPair>();//Vorbereitung für zufällige Auswahl.
 		for( Integer tone : allowed_tones ) {
-			float percent = 0;
-			if( Math.abs( NoteHelper.getInterval( previous, tone ) ) == 0 )//Die verschiedenen Intervall-Wahrscheinlichkeiten werden gespeichert.
-				percent = config.getFrstPercent();
-			else if( Math.abs( NoteHelper.getInterval( previous, tone ) ) == 1 )
-				percent = config.getScndPercent();
-			else if( Math.abs( NoteHelper.getInterval( previous, tone ) ) == 2 )
-				percent = config.getThrdPercent();
-			else if( Math.abs( NoteHelper.getInterval( previous, tone ) ) == 4 )
-				percent = config.getFfthPercent();
-			percent_tones.add( new PercentPair( tone, percent ) );
+			int interval = NoteHelper.getInterval( previous, tone );
+			percent_tones.add(new PercentPair(tone, config.getInterval(interval).getPercent()));//fügt der Auswahlliste ein PercentPair mit Interval und Wahrscheinlichkeit zu
 		}
 		
 		PercentPair[] pn_array = percent_tones.toArray( new PercentPair[ percent_tones.size() ] );//List zu Array
 		
-		int tone = PercentPair.getRandomValue( pn_array, r );//Zufällige Auswahl eines Tons
+		int tone = PercentPair.getRandomValue( pn_array, rand );//Zufällige Auswahl eines Tons
 		chord.used( tone % 12 );//Ton wird als 'benutzt' gesetzt, damit er nicht erneut verwendet wird
 		
 		return tone;
@@ -225,32 +223,28 @@ public class MelodyGenerator {
 	 * @param chord Der momentane Akkord als {@link SChord}
 	 * @return Ein int-Array mit den erlaubten Tönen als Halbtonschritte
 	 */
-	private static int[] getAllowedTones( int previous, SChord chord ) {
+	private static int[] getAllowedTones( int previous, SChord chord, SongConfig config ) {
 		int[] scale = ChordHelper.getScale( chord );//Die Tonleiter des Akkords
 		
 		int preS = ChordHelper.getPositionOnScale( previous, chord );//Speichert die Position des vorherigen Tones auf der Tonleiter des Akkords
 		int octave = previous - scale[ preS ];//Der Oktave-Unterschied zwischen dem echten vorherigen Ton und dem gespeicherten
 		
-		int[] allowed_scale_tones = new int[]{//Die erlaubten Töne als Positionen auf der Tonleiter (Ganze Töne)
-				preS -4,//Erlaubte Intervalle
-				preS -2,
-				preS -1,
-				preS,
-				preS +1,//Mehr Sekunden; Experimentell
-				preS -1,
-				preS +1,
-				preS +2,
-				preS +4
-		};
+		ArrayList<Integer> allowed_scale_tones = new ArrayList<Integer>();//Die erlaubten Töne als Positionen auf der Tonleiter (Ganze Töne)
+		for(PercentPair pp: config.getIntervals()){
+			allowed_scale_tones.add(preS + pp.getValue());
+			if(pp.getValue() != 0)
+				allowed_scale_tones.add(preS - pp.getValue());
+		}
 		
-		int[] steps = new int[ allowed_scale_tones.length ];//Rechnet die Töne wieder zu Halbtonschritten um
-		for( int i = 0; i < allowed_scale_tones.length; i++ ) {
-			if( allowed_scale_tones[ i ] < 0 )
-				steps[ i ] = scale[ allowed_scale_tones[ i ] + scale.length ] - 12;
-			else if( allowed_scale_tones[ i ] >= scale.length )
-				steps[ i ] = scale[ allowed_scale_tones[ i ] - scale.length ] + 12;
+		int[] steps = new int[ allowed_scale_tones.size() ];//Rechnet die Töne wieder zu Halbtonschritten um
+		for( int i = 0; i < allowed_scale_tones.size(); i++ ) {
+			int scale_tone = allowed_scale_tones.get(i);
+			if( scale_tone < 0 )
+				steps[ i ] = scale[ scale_tone + scale.length ] - 12;
+			else if( scale_tone >= scale.length )
+				steps[ i ] = scale[ scale_tone - scale.length ] + 12;
 			else
-				steps[ i ] = scale[ allowed_scale_tones[ i ] ];
+				steps[ i ] = scale[ scale_tone ];
 			
 			steps[ i ] = steps[ i ] + octave;//Oktaven-Unterschied wird addiert
 		}
@@ -263,5 +257,29 @@ public class MelodyGenerator {
 		
 		int[] allowedArr = ArrayHelper.toArray( allowed );//Konvertierung zum Array
 		return allowedArr;
+	}
+	
+	/**
+	 * Wählt nach den im SongConfig festgelegten Wahrscheinlichkeiten den nächsten Ton aus
+	 * @param previous - vorher gespielter Ton
+	 * @param tones - Liste der möglichen nächsten Töne
+	 * @param config - SongConfig für Intervalwahrscheinlichkeiten
+	 * @return den nächsten Ton
+	 */
+	private static int chooseNextTone(int previous, List<Integer> tones, SongConfig config){
+		int ret = 0;
+		ArrayList<PercentPair> intervals = new ArrayList<PercentPair>();
+		for(int tone: tones) {
+			int interval = NoteHelper.getInterval(previous, tone);
+			intervals.add( new PercentPair( tone, config.getInterval(interval).getPercent()));
+		}
+		PercentPair[] pp = new PercentPair[intervals.size()];
+		ret = PercentPair.getRandomValue( intervals.toArray(pp), new Random());
+		return ret;
+	}
+
+	@Override
+	public String getGeneratorName() {
+		return "classic";
 	}
 }

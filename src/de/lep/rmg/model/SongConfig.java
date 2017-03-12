@@ -1,5 +1,6 @@
 package de.lep.rmg.model;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import de.lep.rmg.model.Measure.Clef;
@@ -110,11 +111,12 @@ public class SongConfig {
 	private SChord key = new SChord( SNote.C, CType.MAJOR );
 	
 	/**
-	 * Die Wahrscheinlichkeiten für diese Intervall zwischen zwei aufeinander folgenden Tönen.<br>
-	 * Die Summe muss 1 sein
+	 * Speichert für jedes erlaubte Interval eine Wahrscheinlichkeit.<br>
+	 * Die Summe der Wahrscheinlichkeiten muss 1 ergeben.<br>
+	 * Es werden nur positive Intervalle oder 0 verwendet.
 	 * @category Musikgenerator
 	 */
-	private float frstPercent = .2f, scndPercent = .35f, thrdPercent = .3f, ffthPercent = .15f;
+	private ArrayList<PercentPair> intervals = new ArrayList<PercentPair>();
 	
 	/**
 	 * Die Wahrscheinlichkeiten für die Länge von Dauern (Im XML-/MIDI-Format).<br>
@@ -158,6 +160,10 @@ public class SongConfig {
 		Random rand = new Random();
 		
 //		###		setzt zufällige Intervall-Wahrscheinlichkeiten		###
+		float frstPercent = .2f;
+		float scndPercent = .35f;
+		float thrdPercent = .3f;
+		float ffthPercent = .15f;
 		
 		frstPercent = (rand.nextInt(30) + 5) / 100f;
 		scndPercent = (rand.nextInt(30) + 20) / 100f;
@@ -181,6 +187,12 @@ public class SongConfig {
 		System.out.println("Sekunde : " + scndPercent);
 		System.out.println("Terz : " + thrdPercent);
 		System.out.println("Quinte : " + ffthPercent + "\n");
+		
+		intervals.add( new PercentPair(0, frstPercent));
+		intervals.add( new PercentPair(1, scndPercent));
+		intervals.add( new PercentPair(2, thrdPercent));
+		intervals.add( new PercentPair(4, ffthPercent));
+		
 		
 //		###			zufällige Dauer-Wahrscheinlichkeiten			###
 		
@@ -352,22 +364,6 @@ public class SongConfig {
 //			e.printStackTrace();
 //		}
 //	}
-	
-	public float getFrstPercent() {
-		return frstPercent;
-	}
-
-	public float getScndPercent() {
-		return scndPercent;
-	}
-
-	public float getThrdPercent() {
-		return thrdPercent;
-	}
-
-	public float getFfthPercent() {
-		return ffthPercent;
-	}
 
 	public int getChordDuration() {
 		return chordDuration;
@@ -375,6 +371,30 @@ public class SongConfig {
 
 	public PercentPair[] getNoteDurations() {
 		return PercentPair.clone( noteDurations );
+	}
+	
+	public ArrayList<PercentPair> getIntervals() {
+		return intervals;
+	}
+	
+	/**
+	 * Gibt das PercentPair zum angefragten Interval zurück, falls es existiert.<br>
+	 * Negative Intervalle werden innerhalb der Methode wie positive behandelt und können ohne Einschränkungen übergeben werden.<br>
+	 * Falls das gesuchte Interval nicht vorhanden ist, wird ein PercentPair mit Wahrscheinlichkeit 0 zurückgegeben.<br>
+	 * @param interval - das gesuchte Interval
+	 * @return Das PercentPair zum entsprechenden Interval, in dem Interval und Wahrscheinlichkeit gespeichert sind
+	 */
+	public PercentPair getInterval(int interval) {
+		if(interval < 0){
+			interval *= -1;
+		}
+		for(PercentPair pp: intervals){
+			if(pp.getValue() == interval){
+				return pp;
+			}
+		}
+//		throw new NullPointerException("Interval " + interval + " not in this configs interval-list!");
+		return new PercentPair(interval, 0f);
 	}
 
 	public static SongConfig getArgsInstance() {
