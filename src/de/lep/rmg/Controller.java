@@ -21,7 +21,6 @@ import de.lep.rmg.musicgen.MelodyGenerator;
 //import de.lep.rmg.model.SongConfig;
 import de.lep.rmg.musicgen.MusicGenerator;
 import de.lep.rmg.musicgen.RhythmGenerator;
-import de.lep.rmg.musicgen.markow.MarkowCanonMelodyGenerator;
 import de.lep.rmg.out.midi.MidiPlayer;
 import de.lep.rmg.out.midi.TrackFactory;
 import de.lep.rmg.out.xml.XMLGenerator;
@@ -58,9 +57,7 @@ public class Controller {
 		MidiPlayer player = new MidiPlayer();
 		ArrayList<IMusicGenerator> musicGenList = new ArrayList<IMusicGenerator>();
 		IMusicGenerator gen1 = new MusicGenerator(new MelodyGenerator());//MusicGenerator mit standard MelodyGenerator
-		IMusicGenerator gen2 = new MusicGenerator(new MarkowCanonMelodyGenerator());//MusicGenerator mit MarkowMelodyGenerator
 		musicGenList.add(gen1);
-		musicGenList.add(gen2);
 		
 		//creates a new window and adds the standard components for this programm
 		Window window = new Window(new FlowLayout(), player);

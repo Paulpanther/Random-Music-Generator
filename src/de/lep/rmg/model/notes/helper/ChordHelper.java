@@ -53,7 +53,14 @@ public class ChordHelper {
 		} else if( type == CType.MINOR ) {
 			chord[ 1 ] = (keynote + 3) % 12; 
 			chord[ 2 ] = (chord[ 1 ] + 4) % 12; 
-		}
+		} else if( type == CType.AUG ) {
+			chord[ 1 ] = (keynote + 4) % 12;
+			chord[ 2 ] = (keynote + 4) % 12;
+		} else if( type == CType.DIM ) {
+			chord[ 1 ] = (keynote + 3) % 12;
+			chord[ 2 ] = (keynote + 3) % 12;
+		} else
+			throw new IllegalArgumentException( "Invalid chord" );
 		
 		return chord;
 	}
