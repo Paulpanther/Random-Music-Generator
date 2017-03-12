@@ -144,6 +144,8 @@ public class NoteHelper {
 	 */
 	public static int getAlter( SNote note ) {
 		int modStep = note.getTone() % 12;
+		while( modStep < 0 )
+			modStep += 12;
 		switch( modStep ) {
 		case SNote.C:
 			return 0;

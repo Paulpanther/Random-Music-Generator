@@ -84,12 +84,11 @@ public class SNote implements INote {
 	 */
 	@Override
 	public String toString() {
-		String stepStr = "";
+		String stepStr = NoteHelper.getToneString( this );
 		if( NoteHelper.getAlter( this ) == -1 )
-			stepStr = "#";
-		else if( NoteHelper.getAlter( this ) == 1 )
 			stepStr = "b";
-		stepStr += NoteHelper.getToneString( this );
+		else if( NoteHelper.getAlter( this ) == 1 )
+			stepStr = "#";
 		return "SNote [tone=" + tone + " (" + stepStr + "), octave=" + octave + ", duration=" + duration + "]";
 	}
 }
