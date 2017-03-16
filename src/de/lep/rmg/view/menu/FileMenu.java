@@ -7,6 +7,7 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 
 import de.lep.rmg.model.Song;
@@ -88,6 +89,8 @@ public class FileMenu extends JMenu implements ISongChangeObserver{
 						if(openFile.getPath().endsWith(".xml")){
 							//TODO not yet implemented
 							System.out.println("Noch nicht implementiert. Nur '.midi' Dateien können gelesen werden!");
+							JOptionPane.showMessageDialog(null, "Das Öffnen von Music-XML-Formaten wurde noch nicht implementiert!\n"
+									+ "Nur MIDI-Formate können eingelesen werden.");
 						}else{
 							if(openFile.getPath().endsWith(".midi")){
 								//liest die Datei und spielt den Song
@@ -95,6 +98,7 @@ public class FileMenu extends JMenu implements ISongChangeObserver{
 								player.play(seqGen.loadSequence(openFile));
 							}else{
 								System.out.println("Inkompatibler Dateityp!");
+								JOptionPane.showMessageDialog(null, "Inkompatiebler Dateityp!\nÖffnen nicht möglich!");
 							}
 						}
 					}

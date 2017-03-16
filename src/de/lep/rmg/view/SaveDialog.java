@@ -12,6 +12,7 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -166,6 +167,7 @@ public class SaveDialog extends JDialog {
 							}
 						}
 					}
+					JOptionPane.showMessageDialog(null, "Erfolgreich gespeichert!");
 					//schließt den Dialog
 					SaveDialog.this.dispose();
 				}
