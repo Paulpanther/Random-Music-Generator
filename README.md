@@ -9,8 +9,8 @@ Dafür haben wir uns für die Form des Kanons entschieden.
 Das Projekt wurde bei [Jugend-Forscht](https://www.jugend-forscht.de/ "Die Jugend-Forscht Webseite") vorgestellt und gewann den [2. Preis in der Landesrunde Hessen 2017](http://jugend-forscht.merck.de/blank.microsite.corp/de/images/Siegerliste_2017_tcm1232_161157.pdf?Version= "PDF Seite 13").
 
 ## Weitere Informationen
-Eine detailierte Dokumentation, welche wir für Jugend-Forscht angefertigt haben finden Sie [hier](/Documentation-Jugend-Forscht.odt/ "Unsere Jugend-Forscht-Dokumentation").
-Außerdem haben wir für die Version v0.5.1 des Programms auch einen [Java-Doc](/doc/ "Der Java-Doc der Programmversion v0.5.1") zusammengestellt.
+Eine detailierte Dokumentation, welche wir für Jugend-Forscht angefertigt haben finden Sie [hier](Documentation-Jugend-Forscht.odt/ "Unsere Jugend-Forscht-Dokumentation").
+Außerdem haben wir für die Version v0.5.1 des Programms auch einen [Java-Doc](docs/ "Der Java-Doc der Programmversion v0.5.1") zusammengestellt.
 
 ## Zukunft des Projekts
 Wir haben vor auf Basis dieses Projekts ein neues Projekt zu starten, welches selbstverständlich auch Open Source sein wird.
