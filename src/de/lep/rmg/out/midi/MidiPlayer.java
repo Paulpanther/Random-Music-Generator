@@ -49,7 +49,7 @@ public class MidiPlayer{
 			notifySequenceState();
 			
 			try {
-				Thread.sleep( 200 );
+				Thread.sleep( 150 );//results in better sound quality
 			} catch ( InterruptedException e ) {
 				e.printStackTrace();
 			}

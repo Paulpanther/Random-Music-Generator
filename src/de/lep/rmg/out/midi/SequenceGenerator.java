@@ -6,6 +6,7 @@ import java.io.IOException;
 import javax.sound.midi.*;
 
 import de.lep.rmg.model.Song;
+import de.lep.rmg.model.SongConfig;
 
 /**
  * provides methods for creating, saving and loading {@link Sequence}s<br>
@@ -23,7 +24,7 @@ public class SequenceGenerator {
 		Sequence seq = null;
 		try {
 			//Die 8 steht für eine Auflösung von einem Achtelbeat
-			seq = new Sequence(Sequence.PPQ, 8);
+			seq = new Sequence(Sequence.PPQ, SongConfig.measureDivision);
 		} catch (InvalidMidiDataException e) {
 			System.out.println("Failed to create Sequence");
 			e.printStackTrace();
@@ -54,7 +55,7 @@ public class SequenceGenerator {
 		if(miditype0){
 			try {
 				//Die 8 steht für eine Auflösung von einem Achtelbeat
-				seq = new Sequence(Sequence.PPQ, 8);
+				seq = new Sequence(Sequence.PPQ, SongConfig.measureDivision);
 				trackFac.createTrack(seq, song, false);
 			} catch (InvalidMidiDataException e) {
 				System.out.println("Failed to create Sequence");
@@ -63,7 +64,7 @@ public class SequenceGenerator {
 		}
 		else{
 			try {
-				seq = new Sequence(Sequence.PPQ, 8);
+				seq = new Sequence(Sequence.PPQ, SongConfig.measureDivision);
 				trackFac.createTracks(seq, song);
 			} catch (InvalidMidiDataException e) {
 				System.out.println("Failed to create Sequence");

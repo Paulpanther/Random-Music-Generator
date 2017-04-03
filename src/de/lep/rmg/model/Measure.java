@@ -14,6 +14,7 @@ public class Measure extends ArrayList<INote> implements Cloneable{
 	
 	/**
 	 * Gibt einen relativen Wert an, mit welchem die Dauer berechnet wird.<br>
+	 * Dieser wird aus dem SongConfig übernommen.<br>
 	 * Ein 4tel = 1*division, 8tel = 1/2*division, halb = 2*division, ...<br>
 	 * Ist sozusagen die 'Schärfe' der Dauer, da keine float Werte für die Dauer erlaubt sind.<br>
 	 * Dieser Wert wird für das XML- und MIDI-Format benötigt.

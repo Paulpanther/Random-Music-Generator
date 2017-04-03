@@ -17,11 +17,13 @@ public class SNote implements INote {
 	public static final int C = 0, CIS = 1, D = 2, DIS = 3, E = 4, F = 5, FIS = 6, G = 7, GIS = 8, A = 9, AIS = 10, B = 11;
 	
 	/**
-	 * Verschiedene Dauern.<br>
-	 * Diese gelten nur wenn {@link SongConfig#getMeasureDivision()} == 8 ist.
+	 * Verschiedene Notendauern, abhängig von {@link SongConfig#getMeasureDivision()}.
 	 */
-	public static final int A32TH = 1, A16TH = 2, EIGHTH = 4, EIGHTH_DOT = 6, QUARTER = 8, QUARTER_DOT = 12, 
-			HALF = 16, WHOLE = 32, BREVE = 64, LONG = 128;
+	public static final int A32TH = SongConfig.measureDivision/8, A16TH = SongConfig.measureDivision/4,
+			EIGHTH = SongConfig.measureDivision/2, EIGHTH_DOT = 3*(SongConfig.measureDivision/4),
+			QUARTER = SongConfig.measureDivision, QUARTER_DOT = 3*(SongConfig.measureDivision/2), 
+			HALF = 2*SongConfig.measureDivision, HALF_DOT = 3*SongConfig.measureDivision,
+			WHOLE = 4*SongConfig.measureDivision, BREVE = 8*SongConfig.measureDivision, LONG = 16*SongConfig.measureDivision;
 	
 	/**
 	 * Der Ton der Note.<br>
