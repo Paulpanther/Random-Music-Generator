@@ -75,14 +75,7 @@ public class NoteHelper {
 	 * @return Die Dauer im XML kompatiblen Format
 	 */
 	public static String getDurationString( INote iNote ) {
-		int duration = 0;
-		
-		if( iNote instanceof SNote )
-			duration = ((SNote) iNote).getDuration();
-		else if( iNote instanceof Rest )
-			duration = ((Rest) iNote).getDuration();
-		else if( iNote instanceof Chord )
-			duration = ((Chord) iNote).size() != 0 ? ((Chord) iNote).get( 0 ).getDuration() : 0;
+		int duration = iNote.getDuration();
 		
 		switch( duration ) {
 		case SNote.A32TH:
@@ -90,13 +83,17 @@ public class NoteHelper {
 		case SNote.A16TH:
 			return "16th";
 		case SNote.EIGHTH:
-		case SNote.EIGHTH_DOT:
 			return "eighth";
+		case SNote.EIGHTH_DOT:
+			return "eighth_dot";
 		case SNote.QUARTER:
-		case SNote.QUARTER_DOT:
 			return "quarter";
+		case SNote.QUARTER_DOT:
+			return "quarter_dot";
 		case SNote.HALF:
 			return "half";
+		case SNote.HALF_DOT:
+			return "half_dot";
 		case SNote.WHOLE:
 			return "whole";
 		case SNote.BREVE:

@@ -56,7 +56,7 @@ public class MusicGenerator implements IMusicGenerator {
 		ArrayList<SNote>[][] melody = melGen.generateMelodies( key, chords, rhythm, config );
 		
 		//Vorbereitung für Anordnung
-		int width = config.getChordDuration() * config.getChordNr() / 4;//Die Anzahl an Takten, die eine Melodie lang ist
+		int width = config.getChordDuration() * config.getChordNr() / config.getBeats();//Die Anzahl an Takten, die eine Melodie lang ist
 		
 		//Anordnung der Melodien
 		for( int p = 0; p < config.getMelodyNr(); p++ ) {
@@ -64,36 +64,26 @@ public class MusicGenerator implements IMusicGenerator {
 			
 			for( int m = 0; m < width * p; m++ ) {//Melodie-Einstieg wird verschoben
 				Measure m1 = new Measure( config );
-				m1.add( new Rest( 32 ) );
+				m1.add( new Rest( SongConfig.measureDivision * config.getBeats() ) );//duration of one Measure
 				part.add( m1 );
 			}
 			
 			//Noten werden hinzugefügt
 			for( int r = 0; r < config.getRepeats(); r++ ) {
 				for( int m = 0; m < melody.length; m++ ) {
-					
-					if(config.getChordDuration() == 3){
-						int duration = 0;
-						Measure m1 = new Measure(config);
-						for(ArrayList<SNote> chordList: melody[m]){
-							for(SNote sno: chordList){
-								m1.add(sno);
-								duration += sno.getDuration();
-								if(duration >= 32){
-									part.add( m1.clone());
-									m1 = new Measure(config);
-								}
+
+					int duration = 0;
+					Measure m1 = new Measure( config );
+					for(ArrayList<SNote> chordList: melody[m]){
+						for(SNote sno: chordList){
+							m1.add(sno);
+							duration += sno.getDuration();
+							if(duration >= SongConfig.measureDivision*config.getBeats()){
+								part.add( m1.clone());
+								m1 = new Measure(config);
 							}
 						}
-					}else{
-						for( int mm = 0; mm < width; mm++ ) {
-							Measure me = new Measure( config );
-							for( int c = 0; c < 4 / config.getChordDuration(); c++ ) {
-								int chordNr = 4 / config.getChordDuration() * mm + c;
-								me.addAll( melody[ m ][ chordNr ] );
-							}
-							part.add( me );
-						}
+
 					}
 				}
 			}
@@ -101,7 +91,7 @@ public class MusicGenerator implements IMusicGenerator {
 			//Am Ende wieder Pausen entsprechend dem Einschub
 			for( int m = 0; m < width * ( melody.length - p-1 ); m++ ) {
 				Measure m1 = new Measure( config );
-				m1.add( new Rest( 32 ) );
+				m1.add( new Rest( SongConfig.measureDivision * config.getBeats() ) );
 				part.add( m1 );
 			}
 			
