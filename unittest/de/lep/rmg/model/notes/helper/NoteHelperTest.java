@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import de.lep.rmg.model.notes.CType;
+import de.lep.rmg.model.notes.SChord;
 import de.lep.rmg.model.notes.SNote;
 
 /**
@@ -33,7 +34,7 @@ public class NoteHelperTest {
 	 */
 	@Test
 	public void testAddInterval() {
-		assertEquals( SNote.A, NoteHelper.addInterval( SNote.A, 0, new SChord(SNote.G, CType.MAJOR) );
+		assertEquals( SNote.A, NoteHelper.addInterval( SNote.A, 0, new SChord(SNote.G, CType.MAJOR) ));
 		assertEquals( SNote.E + 12 , NoteHelper.addInterval( SNote.AIS, 3, new SChord(SNote.D, CType.MINOR)));
 		assertEquals( SNote.DIS, NoteHelper.addInterval( SNote.G, -2, new SChord(SNote.C, CType.MINOR)));
 		assertEquals( SNote.AIS, NoteHelper.addInterval( SNote.G, 2, new SChord(SNote.A, CType.DIM)));
