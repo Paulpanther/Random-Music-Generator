@@ -72,15 +72,16 @@ public class MusicGenerator implements IMusicGenerator {
 			for( int r = 0; r < config.getRepeats(); r++ ) {
 				for( int m = 0; m < melody.length; m++ ) {
 
-					int duration = 0;
+					int duration = SongConfig.measureDivision*config.getBeats();
 					Measure m1 = new Measure( config );
 					for(ArrayList<SNote> chordList: melody[m]){
 						for(SNote sno: chordList){
 							m1.add(sno);
-							duration += sno.getDuration();
-							if(duration >= SongConfig.measureDivision*config.getBeats()){
+							duration -= sno.getDuration();
+							if(duration <= 0){
 								part.add( m1.clone());
 								m1 = new Measure(config);
+								duration += SongConfig.measureDivision*config.getBeats();
 							}
 						}
 

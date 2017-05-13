@@ -8,6 +8,9 @@ import java.util.Random;
 import de.lep.rmg.model.SongConfig;
 import de.lep.rmg.model.helper.ArrayHelper;
 import de.lep.rmg.model.helper.PercentPair;
+import de.lep.rmg.model.notes.INote;
+import de.lep.rmg.model.notes.Rest;
+import de.lep.rmg.model.notes.SNote;
 
 /**
  * Klasse zum generieren des Rhythmus.<br>
@@ -35,7 +38,7 @@ public class RhythmGenerator {
 	 * @param config Die Konfiguration des Songs (s. {@link SongConfig}).
 	 * @return Eine 3-dimensionale Liste aus Dauern. Siehe oben zur Struktur.
 	 */
-	static ArrayList<Integer>[][] generateRhythm( SongConfig config ) {
+	public static ArrayList<Integer>[][] generateRhythm( SongConfig config ) {
 		
 		Random r = new Random();
 		int[] miniRhythm1 = generateMiniRhythm( config, r );//1. Mini-Rhythmus
@@ -54,6 +57,24 @@ public class RhythmGenerator {
 			}
 		}
 		return rhythm;
+	}
+	
+	/**
+	 * 
+	 * @param config
+	 * @return rhytmisches Motiv als ArrayList<INote>
+	 */
+	public static ArrayList<INote> generateMotif( SongConfig config ) {
+		ArrayList<INote> motif = new ArrayList<INote>();
+		Random rand = new Random();
+		for(int dur : generateMiniRhythm( config, rand ) ){
+			if( rand.nextFloat() > config.getRestProbability() ){//Im SongConfig eingebaute Wahrscheinlichkeit für eine Pause; experimantell
+				motif.add(new SNote(0, 0, dur));
+			}else{
+				motif.add(new Rest(dur));
+			}
+		}
+		return motif;
 	}
 	
 	/**

@@ -2,6 +2,7 @@ package de.lep.rmg.model.notes.helper;
 
 import de.lep.rmg.model.notes.Chord;
 import de.lep.rmg.model.notes.INote;
+import de.lep.rmg.model.notes.IRealNote;
 import de.lep.rmg.model.notes.Rest;
 import de.lep.rmg.model.notes.SChord;
 import de.lep.rmg.model.notes.SNote;
@@ -250,5 +251,25 @@ public class NoteHelper {
 		retTone += scale[interval] - scale[0];//zählt das Interval zum Ursprungston hinzu
 		retTone += octavechange*12;//gleich die Oktave an
 		return retTone;
+	}
+	
+	/**
+	 * Verändert die Tonhöhe der übergebenen Note, um das angeforderte Interval
+	 * @param note - Note deren Tonhöhe verändert werden soll
+	 * @param interval - Interval, um das verändert wird. 0 == Prime, 1 == Sekunde, ...
+	 * @param key - Grundetonart, die zugrundegelegt wird. Bestimmt den Intervaltyp: klein, groß, rein, ...
+	 */
+	public static void addInterval(IRealNote note, int interval, SChord key){
+		int[] scale = ChordHelper.getScale(key);
+		int octavechange = 0;//Änderung der Oktave
+		while(interval < 0){//Interval muss für Berechnung zwischen 0 und 6 liegen
+			interval += 7;
+			octavechange--;//Oktave muss nachher entsprechend angeglichen werden
+		}
+		while(interval > 6){
+			interval -= 7;
+			octavechange++;
+		}
+		note.addStep( scale[interval] - scale[0] + octavechange*12);//zählt das Interval zum Ursprungston hinzu und gleicht Oktave an
 	}
 }

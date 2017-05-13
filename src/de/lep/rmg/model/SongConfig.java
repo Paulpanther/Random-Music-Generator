@@ -130,6 +130,11 @@ public class SongConfig {
 			new PercentPair( SNote.HALF, .25f )
 	};
 	
+	/**
+	 * Die Wahrscheinlichkeit im Rhythmus statt eines Tons eine Pause einzubauen.
+	 * @category Musikgenerator
+	 */
+	private float restProbability = 0.1f;
 
 	public SongConfig( int chordNr, int repeats, int melodyNr, int chordDuration, SChord key, Instrument[] instruments ) {
 		this.chordNr = chordNr;
@@ -284,6 +289,10 @@ public class SongConfig {
 	
 	public Instrument[] getInstruments() {
 		return instruments;
+	}
+	
+	public float getRestProbability(){
+		return restProbability;
 	}
 	
 //	public void readArgs() {

@@ -8,7 +8,7 @@ import de.lep.rmg.model.notes.helper.NoteHelper;
  * Gehört zum {@link Song}-Modell.
  *
  */
-public class SNote implements INote {
+public class SNote implements INote, IRealNote {
 
 	/**
 	 * Verschiedene Töne in Halbtonschritten.<br>
@@ -65,6 +65,11 @@ public class SNote implements INote {
 		return duration;
 	}
 	
+	@Override
+	public int getStep() {
+		return this.tone + 12 * this.octave;
+	}
+	
 	/*#############################################################################
 	 * 						SETTER
 	 *###########################################################################*/
@@ -80,7 +85,23 @@ public class SNote implements INote {
 	public void setDuration( int duration ) {
 		this.duration = duration;
 	}
-
+	
+	/**
+	 * Erhöht die Note um 'steps' Halbtonschritte und gleicht die interne Variable 'octave' entsprechend an.
+	 * @param steps - Anzahl der Halbtonschritte, um die die Note erhöht wird. Darf auch negativ sein.
+	 */
+	public void addStep( int steps ) {
+		this.tone += steps;
+		while ( tone < 0 ) {
+			this.octave -= 1;
+			this.tone += 12;
+		}
+		while ( tone >= 12 ) {
+			this.octave += 1;
+			this.tone -= 12;
+		}
+	}
+	
 	/**
 	 * Für Debug-Zwecke
 	 */
@@ -93,4 +114,5 @@ public class SNote implements INote {
 			stepStr = "#";
 		return "SNote [tone=" + tone + " (" + stepStr + "), octave=" + octave + ", duration=" + duration + "]";
 	}
+
 }

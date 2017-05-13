@@ -20,7 +20,7 @@ import de.lep.rmg.out.xml.XMLGenerator;
  * @see SChord SChord: Akkordklasse für Musikalgorithmus
  * @see ChordHelper ChordHelper: Hilfsklasse für alle Akkordklassen
  */
-public class Chord extends ArrayList<SNote> implements INote {
+public class Chord extends ArrayList<SNote> implements INote, IRealNote {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -79,6 +79,26 @@ public class Chord extends ArrayList<SNote> implements INote {
 			value += "  " + note.toString() + "\n";
 		value += "]\n";
 		return value;
+	}
+	
+	@Override
+	public void addStep(int steps) {
+		for(SNote sno : this){
+			sno.addStep(steps);
+		}
+	}
+	
+	/**
+	 * @return Tonhöhe der tiefsten Note
+	 */
+	@Override
+	public int getStep() {
+		int ret = 100000;
+		for(SNote sno : this){
+			if(ret > sno.getStep())
+				ret = sno.getStep();
+		}
+		return ret;
 	}
 	
 	

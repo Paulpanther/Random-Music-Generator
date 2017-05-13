@@ -2,10 +2,60 @@ package de.lep.rmg.musicgen.helper;
 
 import java.util.ArrayList;
 
+import de.lep.rmg.model.Measure;
+import de.lep.rmg.model.Part;
+import de.lep.rmg.model.SongConfig;
+import de.lep.rmg.model.instruments.Instrument;
+import de.lep.rmg.model.notes.INote;
+import de.lep.rmg.model.notes.IRealNote;
+import de.lep.rmg.model.notes.Rest;
+import de.lep.rmg.model.notes.SChord;
 import de.lep.rmg.model.notes.SNote;
+import de.lep.rmg.model.notes.helper.NoteHelper;
 
 public class MelodyHelper {
 	
+	public static ArrayList<INote> transpone( ArrayList<INote> notes, int interval, SChord key ){
+		ArrayList<INote> transposition = new ArrayList<INote>();
+		for(INote note: notes){
+			if(note instanceof IRealNote){
+				IRealNote realNote = (IRealNote) note;
+				NoteHelper.addInterval(realNote, interval, key);
+			}
+			transposition.add(note);
+		}
+		return transposition;
+	}
+	
+	/**
+	 * Wandelt eine Liste von Noten (ohne Takteinteilung) in einen {@link Part} (mit Einteilung in Takte) um
+	 * 
+	 * @param config - {@link SongConfig} mit Angaben zu Taktlänge und -art
+	 * @param notes - Notenliste
+	 * @param instru - {@link Instrument} das den Part spielen soll
+	 * @return ein {@link Part}-Objekt
+	 */
+	public static Part noteListToPart( SongConfig config, ArrayList<INote> notes, Instrument instru){
+		Part part = new Part(instru);
+		int duration = SongConfig.measureDivision * config.getBeats();
+		//int duration = 0;
+		Measure mea = new Measure( config );
+		for(INote inote: notes){
+			mea.add(inote);
+			duration -= inote.getDuration();
+			//if(duration >= SongConfig.measureDivision*config.getBeats()){
+			if(duration <= 0){
+				part.add( mea.clone());
+				mea = new Measure(config);
+				duration += SongConfig.measureDivision * config.getBeats();
+			}
+		}
+		if(duration > 0){
+			mea.add(new Rest(duration));//fügt eine entsprechend lange Pause an, falls der letzte Takt nicht komplett  ist
+		}
+		return part;
+	}
+
 	/**
 	  * Vereint die Listen der Tonhöhen und die der Notendauern zu einem Listenarray von SNoten
 	  * @param tones Tonhöhen
