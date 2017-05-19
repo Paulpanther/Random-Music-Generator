@@ -70,7 +70,7 @@ public class SongConfig {
 	
 	/**
 	 * Die Anzahl an Akkorden pro Melodie.<br>
-	 * <code>chordNr * chordDuration</code> muss ein Vielfaches von 4 sein (Melodie muss n Takte lang sein)
+	 * <code>chordNr * chordDuration</code> muss ein Vielfaches von <code>beats sein (Melodie darf nicht mitten im Takt aufhören)
 	 * @category Musikgenerator
 	 */
 	private int chordNr = 4;

@@ -32,14 +32,15 @@ public class MusicGenerator implements IMusicGenerator {
 	 */
 	@Override
 	public Song generateSong( SongConfig config ) {
-		Song song = new Song( config );
-		
 		//Prüft die Konfiguration auf Fehler
-		if( config.getChordNr() * config.getChordDuration() % config.getBeats() != 0 ) {
-			System.err.println( "Error: Songconfig value mismatch\nChordNr: " + config.getChordNr() + "\nChordDuration: " + 
-					config.getChordDuration() + "\nBeats: " + config.getBeats());
-			return null;
+		if( config.getChordNr() * config.getChordDuration() % config.getBeats() != 0){
+			String errorMessage = String.format("SongConfig.getChordNr() * SongConfig.getChordDuration() "
+					+ "does not match SongConfig.getBeats!\nChordNr: %d\nChordDuration: %d\nBeats: %d\n", 
+					config.getChordNr(), config.getChordDuration(), config.getBeats());
+			throw new IllegalStateException(errorMessage);
 		}
+
+		Song song = new Song( config );
 		
 		//Legt den Grundton fest (falls noch nicht festgelegt)
 		SChord key = config.getKey();

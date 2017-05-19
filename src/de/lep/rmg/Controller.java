@@ -74,7 +74,11 @@ public class Controller {
 		menuBar.add(new GeneratorMenu(gcP, musicGenList));
 		window.setJMenuBar(menuBar);
 		
+		SongConfig config = new SongConfig();
 		//stellt Fenster fertig
 		window.pack();
+		System.out.printf("SongConfig.getChordNr() * SongConfig.getChordDuration() "
+				+ "does not match SongConfig.getBeats!\nChordNr: %d\nChordDuration: %d\n Beats: %d\n", 
+				config.getChordNr(), config.getChordDuration(), config.getBeats());
 	}
 }

@@ -59,7 +59,7 @@ public class PercentPair {
 	public static int getRandomValue( PercentPair[] pairs, Random r ) {
 		//Checkt, ob Parameter korrekt sind
 		if(pairs == null || pairs.length == 0){
-			throw new NullPointerException( "null-argument given to PercentPair.getRandomValue" );
+			throw new NullPointerException( "null-argument given to PercentPair.getRandomValue()" );
 		}
 		
 		//Setzt Summe zu 1

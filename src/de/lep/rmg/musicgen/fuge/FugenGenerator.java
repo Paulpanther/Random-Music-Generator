@@ -47,7 +47,7 @@ public class FugenGenerator implements IMusicGenerator {
 		ArrayList<INote> rhythm = RhythmGenerator.generateMotif(config);
 		//generiere Thema und Gegenthema
 		ArrayList<INote> themeList = melGen.generateSubject(config, rhythm);//Das Hauptthema
-		ArrayList <INote> anitThemeList = melGen.generateContreSubject(config, themeList);//Das Gegenthema
+		ArrayList <INote> anitThemeList = melGen.generateAntiSubject(config, themeList);//Das Gegenthema
 		Part themePart = MelodyHelper.noteListToPart(config, themeList, instrument);
 		Part antiThemePart = MelodyHelper.noteListToPart(config, anitThemeList, instrument);
 		//erstelle FugenInfo-Objekt zum bündeln der Informationen
@@ -85,7 +85,7 @@ public class FugenGenerator implements IMusicGenerator {
 	}
 	
 	/**
-	 * Fügt den Parts eine Durchführung an.
+	 * Fügt den Parts eine Durchführung an. Der erste, dritte und fünfte Part, spielt den Dux, die restlichen den Comes.
 	 * @param parts - Liste der Stimmen, welche die Fuge spielen sollen
 	 * @param fugenInfo - {@link FugenInfo} der Fuge
 	 * @param config - das {@link SongConfig} der Fuge
@@ -109,7 +109,7 @@ public class FugenGenerator implements IMusicGenerator {
 	}
 	
 	/**
-	 * Fügt den Parts eine Engführung an
+	 * Fügt den Parts eine Engführung an. Der erste, dritte und fünfte Part, spielt den Dux, die restlichen den Comes.
 	 * @param parts - Liste der Stimmen, welche die Fuge spielen sollen
 	 * @param fugenInfo - {@link FugenInfo} der Fuge
 	 * @param config - das {@link SongConfig} der Fuge

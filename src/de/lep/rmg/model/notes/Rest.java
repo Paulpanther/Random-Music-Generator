@@ -32,4 +32,8 @@ public class Rest implements INote {
 	public String toString() {
 		return "Rest [duration=" + duration + "]";
 	}
+	
+	public Rest clone(){
+		return new Rest( this.duration );
+	}
 }

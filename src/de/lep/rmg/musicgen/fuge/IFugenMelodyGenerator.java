@@ -7,31 +7,33 @@ import de.lep.rmg.model.notes.INote;
 
 public interface IFugenMelodyGenerator {
 	/**
-	 * Generiert das Hauptmotiv einer Fuge
+	 * Generiert das Hauptmotiv einer Fuge. Es wird keine neue {@link ArrayList} erschaffen
+	 * sondern, die Noten im rhythm, werden angepasst. Soll der rhythm unverändert erhalten bleiben,
+	 * muss eine tiefe Kopie übergeben werden.
 	 * 
 	 * @param config - ein SongConfig
-	 * @param rhythm - der Rhythmus das Thema folgen soll als INotes in einer ArrayList
-	 * @return Melodie als ArrayList
+	 * @param rhythm - der Rhythmus dem das Thema folgen soll, als INotes in einer ArrayList
+	 * @return Thema als ArrayList
 	 */
 	public ArrayList<INote> generateSubject( SongConfig config, ArrayList<INote> rhythm );
 	/**
 	 * Generiert passened zu einem Thema ein Gegenthema, mit der gleichen Taktanzahl.
 	 * 
 	 * @param config - ein SongConfig
-	 * @param dux - das Thema dessen Gegenpart geschaffen werden soll als INotes in einer ArrayList
+	 * @param subject - das Thema dessen Gegenpart geschaffen werden soll als INotes in einer ArrayList
 	 * @return Gegenthema als ArrayList
 	 */
-	public ArrayList<INote> generateContreSubject( SongConfig config, ArrayList<INote> motif );
+	public ArrayList<INote> generateAntiSubject( SongConfig config, ArrayList<INote> sublect );
 	/**
 	 * Generiert eine freie Stimme die mit Thema und Gegenthema harmoniert und<br>
 	 * gut an das Gegenthema anschließt.<br>
 	 * Setzt voraus, dass Thema und Gegenthema gleich lang sind.
 	 * 
 	 * @param config - ein SongConfig
-	 * @param motif - Hauptmotiv der Fuge
-	 * @param contreMotif - Nebenmotiv der Fuge
+	 * @param subject - Hauptmotiv der Fuge
+	 * @param antiSubject - Nebenmotiv der Fuge
 	 * @param length - Dauer der freien Stimme in Vielfachen der Länge des Themas
 	 * @return freie Stimme als ArrayList
 	 */
-	public ArrayList<INote> generateSubVoice( SongConfig config, ArrayList<INote> motif, ArrayList<INote> contreMotif, int length );
+	public ArrayList<INote> generateSubVoice( SongConfig config, ArrayList<INote> subject, ArrayList<INote> antiSubject, int length );
 }
