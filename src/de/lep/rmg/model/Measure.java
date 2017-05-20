@@ -117,6 +117,9 @@ public class Measure extends ArrayList<INote> implements Cloneable{
 		return value;
 	}
 	
+	/**
+	 * im Measure enthaltene Noten werden nicht geklont
+	 */
 	public Measure clone(){
 		Measure mea = new Measure( division, fifths, beats, beattype, clef );
 		mea.addAll(this);

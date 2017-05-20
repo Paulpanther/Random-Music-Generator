@@ -15,6 +15,16 @@ import de.lep.rmg.model.notes.helper.NoteHelper;
 
 public class MelodyHelper {
 	
+	/**
+	 * Transponiert eine Liste von Noten, um das angegebene Interval und gibt
+	 * das Ergebnis in einer neuen List zurück. Das Original bleibt erhalten.
+	 * Funktioniert nur für Noten, die {@link IRealNote} implementieren, andere
+	 * Noten werden wie Pausen behandelt und bleiben unverändert.
+	 * @param notes - Liste der zu Transponierenden Noten
+	 * @param interval - Intervval, um das Transponiert wird
+	 * @param key - Grundtonart des Originals
+	 * @return die transponierte Melodie
+	 */
 	public static ArrayList<INote> transpone( ArrayList<INote> notes, int interval, SChord key ){
 		ArrayList<INote> transposition = new ArrayList<INote>();
 		for(INote note: notes){
@@ -75,4 +85,38 @@ public class MelodyHelper {
 		return melody;
 	}
 	
+	/**
+	 * Spaltet von einer Liste von {@link INote}n eine kleinere Liste ab, deren Notenlängen die als Parameter
+	 * angegebene Gesamtlänge (duration) erreichen. Die Originalliste bleibt unverändert
+	 * @param notes - Liste der Noten, von der abgespalten werden soll
+	 * @param duration - die Summe der Notendauern, die das angespaltene Stück haben soll
+	 * @param beginFront - falls true werden die Noten vom Anfang der Liste aus gewählt, 
+	 * 	ansonsten wird rückwärts über die Liste iteriet
+	 * @return neue Liste, die
+	 */
+	public static ArrayList<INote> subtNoteList(ArrayList<INote> notes, int duration, boolean beginFront) {
+		ArrayList<INote> ret = new ArrayList<INote>();
+		INote nextNote;
+		if(beginFront)
+			nextNote = notes.get(0);
+		else
+			nextNote = notes.get(notes.size() - 1);
+		duration -= nextNote.getDuration();
+		int elemCount = 1;
+		while( duration > 0 ) {
+			ret.add(nextNote);
+			if(beginFront)
+				nextNote = notes.get(elemCount);
+			else
+				nextNote = notes.get(notes.size() - elemCount - 1);
+			duration -= nextNote.getDuration();
+			elemCount++;
+		}
+		if(duration < 0) {
+			nextNote = nextNote.clone();
+			nextNote.setDuration(Math.abs(duration));
+			ret.add(nextNote);
+		}
+		return ret;
+	}
 }

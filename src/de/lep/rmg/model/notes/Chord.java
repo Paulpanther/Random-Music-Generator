@@ -131,5 +131,12 @@ public class Chord extends ArrayList<SNote> implements INote {
 		}
 		return lowest.getOctave();
 	}
+
+	@Override
+	public void setDuration(int duration) {
+		for( SNote sno : this) {
+			sno.setDuration(duration);
+		}
+	}
 	
 }

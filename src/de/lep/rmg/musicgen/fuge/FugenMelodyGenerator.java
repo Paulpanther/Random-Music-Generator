@@ -56,7 +56,7 @@ public class FugenMelodyGenerator implements IFugenMelodyGenerator {
 	}
 
 	@Override
-	public ArrayList<INote> generateSubVoice(SongConfig config, ArrayList<INote> motif, ArrayList<INote> contreMotif, int length) {
+	public ArrayList<INote> generateSubVoice(SongConfig config, FugenInfo fugenInfo, int length) {
 		// TODO Auto-generated method stub
 		return null;
 	}

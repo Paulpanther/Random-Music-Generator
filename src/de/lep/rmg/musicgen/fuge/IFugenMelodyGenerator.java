@@ -18,6 +18,7 @@ public interface IFugenMelodyGenerator {
 	public ArrayList<INote> generateSubject( SongConfig config, ArrayList<INote> rhythm );
 	/**
 	 * Generiert passened zu einem Thema ein Gegenthema, mit der gleichen Taktanzahl.
+	 * Es wird in der gleichen Tonhöhe und Tonart komponiert, wie das Hauptthema.
 	 * 
 	 * @param config - ein SongConfig
 	 * @param subject - das Thema dessen Gegenpart geschaffen werden soll als INotes in einer ArrayList
@@ -25,7 +26,7 @@ public interface IFugenMelodyGenerator {
 	 */
 	public ArrayList<INote> generateAntiSubject( SongConfig config, ArrayList<INote> sublect );
 	/**
-	 * Generiert eine freie Stimme die mit Thema und Gegenthema harmoniert und<br>
+	 * Generiert eine freie Stimme die mit Thema und Gegenthema harmoniert und
 	 * gut an das Gegenthema anschließt.<br>
 	 * Setzt voraus, dass Thema und Gegenthema gleich lang sind.
 	 * 
@@ -35,5 +36,5 @@ public interface IFugenMelodyGenerator {
 	 * @param length - Dauer der freien Stimme in Vielfachen der Länge des Themas
 	 * @return freie Stimme als ArrayList
 	 */
-	public ArrayList<INote> generateSubVoice( SongConfig config, ArrayList<INote> subject, ArrayList<INote> antiSubject, int length );
+	public ArrayList<INote> generateSubVoice( SongConfig config, FugenInfo fugenInfo, int length );
 }

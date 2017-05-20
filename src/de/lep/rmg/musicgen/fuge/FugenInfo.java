@@ -1,6 +1,9 @@
 package de.lep.rmg.musicgen.fuge;
 
+import java.util.ArrayList;
+
 import de.lep.rmg.model.Part;
+import de.lep.rmg.model.notes.INote;
 
 /**
  * 
@@ -11,20 +14,30 @@ import de.lep.rmg.model.Part;
  * 
  */
 public class FugenInfo {
-	private Part Subject, antiSubject;
+	private ArrayList<INote> subjectList, antiSubjectList;
+	private Part subjectPart, antiSubjectPart;
 	private int voices;
 	
-	protected FugenInfo(Part Subject, Part antiSubject, int voices){
-		this.Subject = Subject;
-		this.antiSubject = antiSubject;
+	protected FugenInfo(ArrayList<INote> subjectList,ArrayList<INote> antiSubjectList,
+			Part subjectPart, Part antiSubjectPart, int voices){
+		this.subjectList = subjectList;
+		this.antiSubjectList = antiSubjectList;
+		this.subjectPart = subjectPart;
+		this.antiSubjectPart = antiSubjectPart;
 		this.voices = voices;
  	}	
 	
-	Part getSubject(){
-		return Subject;
+	ArrayList<INote> getSubjectList(){
+		return subjectList;
 	}
-	Part getAntiSubject(){
-		return antiSubject;
+	ArrayList<INote> getAntiSubjectList(){
+		return antiSubjectList;
+	}
+	Part getSubjectPart(){
+		return subjectPart;
+	}
+	Part getAntiSubjectPart(){
+		return antiSubjectPart;
 	}
 	int getVoices(){
 		return voices;

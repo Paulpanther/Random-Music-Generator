@@ -7,4 +7,6 @@ package de.lep.rmg.model.notes;
  */
 public interface INote extends Cloneable {
 	int getDuration();
+	void setDuration(int duration);
+	INote clone();
 }
