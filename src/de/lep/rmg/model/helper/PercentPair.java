@@ -113,6 +113,20 @@ public class PercentPair {
 	}
 	
 	/**
+	 * Prüft, ob ein bestimmter Wert in einem Array von PercentPairs vorkommt
+	 * @param pairs - zu durchsuchender Array
+	 * @param value - Wert auf den geprüft wird
+	 * @return true, falls value in pairs vorhanden ist
+	 */
+	public static boolean valueInArray( PercentPair[] pairs, int value){
+		for( PercentPair pair : pairs) {
+			if( pair.getValue() == value)
+				return true;
+		}
+		return false;
+	}
+	
+	/**
 	 * Klont ein PercentPair-Array
 	 * 
 	 * @param old Das alte Array
