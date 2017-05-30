@@ -9,6 +9,7 @@ import de.lep.rmg.model.notes.INote;
 import de.lep.rmg.model.notes.IRealNote;
 import de.lep.rmg.model.notes.SNote;
 import de.lep.rmg.model.notes.helper.NoteHelper;
+import de.lep.rmg.musicgen.RhythmGenerator;
 
 /**
  * 
@@ -51,8 +52,11 @@ public class FugenMelodyGenerator implements IFugenMelodyGenerator {
 	
 	@Override
 	public ArrayList<INote> generateAntiSubject(SongConfig config, ArrayList<INote> subject) {
+		ArrayList<INote> antiSubject = RhythmGenerator.generateAntiMotif(config, subject);
+		
 		// TODO Auto-generated method stub
-		return null;
+		
+		return antiSubject;
 	}
 
 	@Override

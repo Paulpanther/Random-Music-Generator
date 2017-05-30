@@ -23,7 +23,7 @@ import de.lep.rmg.out.xml.XMLGenerator;
  * Zu jeden Feld steht in '@category', in welchen Algorithmus sie verwendet wird (XML- oder MIDI-Felder ändern nichts am Musikgenerator):
  * XML: Wird in {@link XMLGenerator} verwendet.<br>
  * MIDI: Wird in {@link TrackFactory} verwendet.<br>
- * Musikgenerator: Wird bei der Komposition des Songs verwendet.
+ * Musikgenerator: Wird beim Komponieren des Songs verwendet.
  */
 public class SongConfig {
 
@@ -31,7 +31,7 @@ public class SongConfig {
 	 * Gibt einen relativen Wert an, mit welchem die Dauer berechnet wird.<br>
 	 * Ein 4tel = 1*division, 8tel = 1/2*division, halb = 2*division, ...<br>
 	 * Ist sozusagen die 'Schärfe' der Dauer, da keine float Werte für die Dauer erlaubt sind.
-	 * @category XML und MIDI
+	 * @category XML, MIDI und Musikgenerator
 	 */
 	public static final int measureDivision = 8;
 	
@@ -43,11 +43,10 @@ public class SongConfig {
 	private int fifth = 0;
 	
 	/**
-	 * Steht für die Taktart.<br>
-	 * Hat momentan noch keine Auswirkung im Musikgenerator, was noch geändert werden sollte.
-	 * @category XML und MIDI
+	 * Steht für die Taktart
+	 * @category XML, MIDI und Musikgenerator
 	 */
-	private int beats = 4, beatType = 4;//TODO Baue Taktart in Musikgenerator ein
+	private int beats = 4, beatType = 4;
 	
 	/**
 	 * Gibt den Notenschlüssel an.
@@ -99,7 +98,7 @@ public class SongConfig {
 	 * Die Instrumente mit denen der Song abgespielt wird.<br>
 	 * Werden zwar mit in {@link Song} gespeichert, werden aber nicht in der Musik-Generierung benutzt.<br>
 	 * <code>melodyNr == instruments.length</code> muss True sein.
-	 * @category XML und MIDI
+	 * @category (XML, MIDI) und Musikgenerator
 	 */
 	private Instrument[] instruments = { new Piano(), new Flute(), new AcusticGuitar() };
 	
@@ -120,7 +119,8 @@ public class SongConfig {
 	
 	/**
 	 * Die Wahrscheinlichkeiten für die Länge von Dauern (Im XML-/MIDI-Format).<br>
-	 * Die Summe muss 1 sein
+	 * Der Array ist nach Notenlängen sortiert, so dass die kürzeste Notenlänge in noteDurations[0] steht.<br>
+	 * Die Summe der Wahrscheinlichkeiten muss 1 sein
 	 * @category Musikgenerator
 	 */
 	private PercentPair[] noteDurations = { 
@@ -131,7 +131,7 @@ public class SongConfig {
 	};
 	
 	/**
-	 * Die Wahrscheinlichkeit im Rhythmus statt eines Tons eine Pause einzubauen.
+	 * Die Wahrscheinlichkeit im Rhythmus statt eines Tones eine Pause einzubauen.
 	 * @category Musikgenerator
 	 */
 	private float restProbability = 0.1f;
