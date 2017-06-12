@@ -14,6 +14,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import de.lep.rmg.model.Song;
 import de.lep.rmg.model.SongConfig;
@@ -44,6 +46,8 @@ public class CanonControllPanel extends ControllPanel{
 	JSlider chordDurationSlider;
 	JLabel repeatsLabel;
 	JSlider repeatsSlider;
+	JLabel instrumentNrLabel;
+	JSlider instrumentNrSlider;	
 	JLabel instrumentsLabel;
 	JLabel volumeLabel;
 	JComboBox<Instrument> instrument1ComboBox;
@@ -58,8 +62,6 @@ public class CanonControllPanel extends ControllPanel{
 	JSlider volume5Slider;
 	JComboBox<Instrument> instrument6ComboBox;
 	JSlider volume6Slider;
-	//Anzahl der activierten instrumentComboBoxen
-	int instr;
 	//Anzahl an wählbaren Instrumenten
 	int instrNumber = InstrumentHelper.getAllInstrNumber();
 	
@@ -71,14 +73,13 @@ public class CanonControllPanel extends ControllPanel{
 	 */
 	public CanonControllPanel(IMusicGenerator musicGen, MidiPlayer midiPlayer, int instruments){
 		super();
-		instr = instruments;
-		if( instruments < 1 )
-			instr = 1;
+		if( instruments < 2 )
+			instruments = 2;
 		else
 			if( instruments > 6 )
-				instr = 6;
+				instruments = 6;
 		//die Anzahl der Reihen hängt von der Anzahl an Instrumenten ab
-		setLayout(new GridLayout( 7 + instr, 2 ));
+		setLayout(new GridLayout( 8 + instruments, 2 ));
 		observers = new ArrayList<ISongChangeObserver>();
 		this.musicGen = musicGen;
 		this.midiPlayer = midiPlayer;
@@ -102,6 +103,12 @@ public class CanonControllPanel extends ControllPanel{
 		repeatsSlider = new JSlider(1, 3, 2);
 		repeatsSlider.setMajorTickSpacing(2);
 		repeatsSlider.setPaintLabels(true);
+		instrumentNrLabel = new JLabel("Stimmenanzahl:");
+		instrumentNrSlider = new JSlider( 2, 6, instruments);
+		instrumentNrSlider.setMajorTickSpacing(2);
+		instrumentNrSlider.setPaintTicks(true);
+		instrumentNrSlider.setPaintLabels(true);
+		instrumentNrSlider.addChangeListener(new ChangeHandler());
 		keyLabel = new JLabel("Grundton:");
 		keyComboBox = new JComboBox<String>(new String[] {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "H", "Zufall"});
 		keyTypeLabel = new JLabel("Tonart:");
@@ -116,78 +123,60 @@ public class CanonControllPanel extends ControllPanel{
 		add(chordDurationSlider);
 		add(repeatsLabel);
 		add(repeatsSlider);
+		add(instrumentNrLabel);
+		add(instrumentNrSlider);
 		add(instrumentsLabel);
 		add(volumeLabel);
 		
-		//initializes a number of components depending on the number of instruments
-		switch( instr ){
-		case 6:	instrument6ComboBox = new JComboBox<Instrument>(InstrumentHelper.getAllInstrIncNull());
-			instrument6ComboBox.setSelectedIndex(/*Random*/ InstrumentHelper.getAllInstrNumber());
-			volume6Slider = new JSlider(0, 120, 100);
-			volume6Slider.setMajorTickSpacing(24);
-			volume6Slider.setMinorTickSpacing(8);
-			volume6Slider.setPaintTicks(true);
-			volume6Slider.setPaintLabels(true);
-		case 5:	instrument5ComboBox = new JComboBox<Instrument>(InstrumentHelper.getAllInstrIncNull());
-			instrument5ComboBox.setSelectedIndex(InstrumentHelper.getAllInstrNumber());
-			volume5Slider = new JSlider(0, 120, 100);
-			volume5Slider.setMajorTickSpacing(24);
-			volume5Slider.setMinorTickSpacing(8);
-			volume5Slider.setPaintTicks(true);
-			volume5Slider.setPaintLabels(true);
-		case 4:	instrument4ComboBox = new JComboBox<Instrument>(InstrumentHelper.getAllInstrIncNull());
-			instrument4ComboBox.setSelectedIndex(InstrumentHelper.getAllInstrNumber());
-			volume4Slider = new JSlider(0, 120, 100);
-			volume4Slider.setMajorTickSpacing(24);
-			volume4Slider.setMinorTickSpacing(8);
-			volume4Slider.setPaintTicks(true);
-			volume4Slider.setPaintLabels(true);
-		case 3:	instrument3ComboBox = new JComboBox<Instrument>(InstrumentHelper.getAllInstrIncNull());
-			instrument3ComboBox.setSelectedIndex(InstrumentHelper.getAllInstrNumber());
-			volume3Slider = new JSlider(0, 120, 100);
-			volume3Slider.setMajorTickSpacing(24);
-			volume3Slider.setMinorTickSpacing(8);
-			volume3Slider.setPaintTicks(true);
-			volume3Slider.setPaintLabels(true);
-		case 2:	instrument2ComboBox = new JComboBox<Instrument>(InstrumentHelper.getAllInstrIncNull());
-			instrument2ComboBox.setSelectedIndex(InstrumentHelper.getAllInstrNumber());
-			volume2Slider = new JSlider(0, 120, 100);
-			volume2Slider.setMajorTickSpacing(24);
-			volume2Slider.setMinorTickSpacing(8);
-			volume2Slider.setPaintTicks(true);
-			volume2Slider.setPaintLabels(true);
-		case 1:	instrument1ComboBox = new JComboBox<Instrument>(InstrumentHelper.getAllInstrIncNull());
-			instrument1ComboBox.setSelectedIndex(/*Piano*/ 4);
-			volume1Slider = new JSlider(0, 120, 100);
-			volume1Slider.setMajorTickSpacing(24);
-			volume1Slider.setMinorTickSpacing(8);
-			volume1Slider.setPaintTicks(true);
-			volume1Slider.setPaintLabels(true);
-		}
+		instrument6ComboBox = new JComboBox<Instrument>(InstrumentHelper.getAllInstrIncNull());
+		instrument6ComboBox.setSelectedIndex(/*Random*/ InstrumentHelper.getAllInstrNumber());
+		volume6Slider = new JSlider(0, 120, 100);
+		volume6Slider.setMajorTickSpacing(24);
+		volume6Slider.setMinorTickSpacing(8);
+		volume6Slider.setPaintTicks(true);
+		volume6Slider.setPaintLabels(true);
+		instrument5ComboBox = new JComboBox<Instrument>(InstrumentHelper.getAllInstrIncNull());
+		instrument5ComboBox.setSelectedIndex(InstrumentHelper.getAllInstrNumber());
+		volume5Slider = new JSlider(0, 120, 100);
+		volume5Slider.setMajorTickSpacing(24);
+		volume5Slider.setMinorTickSpacing(8);
+		volume5Slider.setPaintTicks(true);
+		volume5Slider.setPaintLabels(true);
+		instrument4ComboBox = new JComboBox<Instrument>(InstrumentHelper.getAllInstrIncNull());
+		instrument4ComboBox.setSelectedIndex(InstrumentHelper.getAllInstrNumber());
+		volume4Slider = new JSlider(0, 120, 100);
+		volume4Slider.setMajorTickSpacing(24);
+		volume4Slider.setMinorTickSpacing(8);
+		volume4Slider.setPaintTicks(true);
+		volume4Slider.setPaintLabels(true);
+		instrument3ComboBox = new JComboBox<Instrument>(InstrumentHelper.getAllInstrIncNull());
+		instrument3ComboBox.setSelectedIndex(InstrumentHelper.getAllInstrNumber());
+		volume3Slider = new JSlider(0, 120, 100);
+		volume3Slider.setMajorTickSpacing(24);
+		volume3Slider.setMinorTickSpacing(8);
+		volume3Slider.setPaintTicks(true);
+		volume3Slider.setPaintLabels(true);
+		instrument2ComboBox = new JComboBox<Instrument>(InstrumentHelper.getAllInstrIncNull());
+		instrument2ComboBox.setSelectedIndex(InstrumentHelper.getAllInstrNumber());
+		volume2Slider = new JSlider(0, 120, 100);
+		volume2Slider.setMajorTickSpacing(24);
+		volume2Slider.setMinorTickSpacing(8);
+		volume2Slider.setPaintTicks(true);
+		volume2Slider.setPaintLabels(true);
+		instrument1ComboBox = new JComboBox<Instrument>(InstrumentHelper.getAllInstrIncNull());
+		instrument1ComboBox.setSelectedIndex(/*Piano*/ 4);
+		volume1Slider = new JSlider(0, 120, 100);
+		volume1Slider.setMajorTickSpacing(24);
+		volume1Slider.setMinorTickSpacing(8);
+		volume1Slider.setPaintTicks(true);
+		volume1Slider.setPaintLabels(true);
+
 		//adding instrument specific components in order
 		add(instrument1ComboBox);
 		add(volume1Slider);
-		
-		if(instr > 1){
-			add(instrument2ComboBox);
-			add(volume2Slider);
-			if(instr > 2){
-				add(instrument3ComboBox);
-				add(volume3Slider);
-				if(instr > 3){
-					add(instrument4ComboBox);
-					add(volume4Slider);
-					if(instr > 4){
-						add(instrument5ComboBox);
-						add(volume5Slider);
-						if(instr > 5){
-							add(instrument6ComboBox);
-							add(volume6Slider);
-						}
-					}
-				}
-			}
-		}
+		add(instrument2ComboBox);
+		add(volume2Slider);
+		setInstrumentNr(instruments);
 		
 		add(keyLabel);
 		add(keyComboBox);
@@ -239,6 +228,16 @@ public class CanonControllPanel extends ControllPanel{
 		}
 	}
 	
+	private class ChangeHandler implements ChangeListener {
+
+		@Override
+		public void stateChanged(ChangeEvent cE) {
+			if(cE.getSource() == instrumentNrSlider)
+				setInstrumentNr(instrumentNrSlider.getValue());
+		}
+		
+	}
+	
 	/**
 	 * setzt überall aßer bei den Lautstärken zufällige Werte
 	 */
@@ -251,7 +250,7 @@ public class CanonControllPanel extends ControllPanel{
 		//bei den ComboBoxen wird das Element Zufall nicht angewählt
 		keyComboBox.setSelectedIndex(rand.nextInt(12));
 		keyTypeComboBox.setSelectedIndex(rand.nextInt(2));
-		switch( instr ){
+		switch( instrumentNrSlider.getValue() ){
 		case 6:
 			instrument6ComboBox.setSelectedIndex(rand.nextInt(instrNumber));
 		case 5:
@@ -301,7 +300,7 @@ public class CanonControllPanel extends ControllPanel{
 		}
 
 		//wählt zufällige Instrumente aus falls der Nutzer "Zufall" wählt
-		switch( instr ){
+		switch( instrumentNrSlider.getValue() ){
 		case 6:	if(instrument6ComboBox.getSelectedIndex() == instrNumber){
 			instrument6ComboBox.setSelectedIndex(rand.nextInt(instrNumber));
 		}
@@ -322,22 +321,22 @@ public class CanonControllPanel extends ControllPanel{
 		}
 		}
 		//speichert die Instrumente in ein Array
-		Instrument[] instruments = new Instrument[instr];
+		Instrument[] instruments = new Instrument[instrumentNrSlider.getValue()];
 		instruments[0] = instrument1ComboBox.getItemAt(instrument1ComboBox.getSelectedIndex());
 		instruments[0].setVolume(volume1Slider.getValue());
-		if(instr > 1){
+		if(instrumentNrSlider.getValue() > 1){
 			instruments[1] = instrument2ComboBox.getItemAt(instrument2ComboBox.getSelectedIndex());
 			instruments[1].setVolume(volume2Slider.getValue());
-			if(instr > 2){
+			if(instrumentNrSlider.getValue() > 2){
 				instruments[2] = instrument3ComboBox.getItemAt(instrument3ComboBox.getSelectedIndex());
 				instruments[2].setVolume(volume3Slider.getValue());
-				if(instr > 3){
+				if(instrumentNrSlider.getValue() > 3){
 					instruments[3] = instrument4ComboBox.getItemAt(instrument4ComboBox.getSelectedIndex());
 					instruments[3].setVolume(volume4Slider.getValue());
-					if(instr > 4){
+					if(instrumentNrSlider.getValue() > 4){
 						instruments[4] = instrument5ComboBox.getItemAt(instrument5ComboBox.getSelectedIndex());
 						instruments[4].setVolume(volume5Slider.getValue());
-						if(instr > 5){
+						if(instrumentNrSlider.getValue() > 5){
 							instruments[5] = instrument6ComboBox.getItemAt(instrument6ComboBox.getSelectedIndex());
 							instruments[5].setVolume(volume6Slider.getValue());
 						}
@@ -346,7 +345,7 @@ public class CanonControllPanel extends ControllPanel{
 			}
 		}
 		//macht das SongConfig und generiert einen Song mit dem MusicGenerator
-		SongConfig config = new SongConfig(chordNrSlider.getValue(), repeatsSlider.getValue(), instr, chordDurationSlider.getValue(),
+		SongConfig config = new SongConfig(chordNrSlider.getValue(), repeatsSlider.getValue(), instrumentNrSlider.getValue(), chordDurationSlider.getValue(),
 				new SChord(keyComboBox.getSelectedIndex(), ctype), instruments);
 		Song song = musicGen.generateSong(config);
 		//standard Speicherung
@@ -365,4 +364,36 @@ public class CanonControllPanel extends ControllPanel{
 		midiPlayer.play(seq);
 	}
 	
+	private void setInstrumentNr(int instrNr) {
+		//entferntComponenten, die eventuell zu viel sind
+		remove(instrument3ComboBox);
+		remove(volume3Slider);
+		remove(instrument4ComboBox);
+		remove(volume4Slider);
+		remove(instrument5ComboBox);
+		remove(volume5Slider);
+		remove(instrument6ComboBox);
+		remove(volume6Slider);
+		//Layout an InstrumentenAnzahl anpassen
+		setLayout(new GridLayout( 8 + instrNr, 2));
+		//instrumentenspezifische Componenten hinzufügen
+		if(instrNr > 2){
+			add(instrument3ComboBox, 14);//TODO remove hard coded indices, replace by dynamic approach
+			add(volume3Slider, 15);
+			if(instrNr > 3){
+				add(instrument4ComboBox, 16);
+				add(volume4Slider, 17);
+				if(instrNr > 4){
+					add(instrument5ComboBox, 18);
+					add(volume5Slider, 19);
+					if(instrNr > 5){
+						add(instrument6ComboBox, 20);
+						add(volume6Slider, 21);
+					}
+				}
+			}
+		}
+		doLayout();
+		repaint();
+	}
 }

@@ -319,31 +319,21 @@ public class FugenControllPanel extends ControllPanel{
 		//Layout an InstrumentenAnzahl anpassen
 		setLayout(new GridLayout( 7 + instrNr, 2));
 		//instrumentenspezifische Componenten hinzufügen
-		switch(instrNr){
-		case 3:	add(instrument3ComboBox, 12);//TODO remove hardcoded indices, replace by something dynamic
+		if(instrNr > 2){
+			add(instrument3ComboBox, 12);//TODO remove hard coded indices, replace by dynamic approach
 			add(volume3Slider, 13);
-			break;
-		case 4:	add(instrument3ComboBox, 12);
-			add(volume3Slider, 13);
-			add(instrument4ComboBox, 14);
-			add(volume4Slider, 15);
-			break;
-		case 5:	add(instrument3ComboBox, 12);
-			add(volume3Slider, 13);
-			add(instrument4ComboBox, 14);
-			add(volume4Slider, 15);
-			add(instrument5ComboBox, 16);
-			add(volume5Slider, 17);
-			break;
-		case 6:	add(instrument3ComboBox, 12);
-			add(volume3Slider, 13);
-			add(instrument4ComboBox, 14);
-			add(volume4Slider, 15);
-			add(instrument5ComboBox, 16);
-			add(volume5Slider, 17);
-			add(instrument6ComboBox, 18);
-			add(volume6Slider, 19);
-			break;
+			if(instrNr > 3){
+				add(instrument4ComboBox, 14);
+				add(volume4Slider, 15);
+				if(instrNr > 4){
+					add(instrument5ComboBox, 16);
+					add(volume5Slider, 17);
+					if(instrNr > 5){
+						add(instrument6ComboBox, 18);
+						add(volume6Slider, 19);
+					}
+				}
+			}
 		}
 		doLayout();
 		repaint();
