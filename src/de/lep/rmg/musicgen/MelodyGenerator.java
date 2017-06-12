@@ -19,7 +19,7 @@ import de.lep.rmg.musicgen.helper.MelodyHelper;
  * Was der Name sagt: Generiert Melodien<br>
  * Die Klasse beinhaltet die nur im Package sichtbare Methode {@link MelodyGenerator#generateMelodies(SChord[], ArrayList[][], SongConfig)}, welche die Melodien generiert.
  *
- * @see MusicGenerator Controller für diese Klasse
+ * @see CanonGenerator Controller für diese Klasse
  */
 public class MelodyGenerator implements ICanonMelodyGenerator{
 	
@@ -278,8 +278,4 @@ public class MelodyGenerator implements ICanonMelodyGenerator{
 		return ret;
 	}
 
-	@Override
-	public String getGeneratorName() {
-		return "classic";
-	}
 }

@@ -17,51 +17,33 @@ import javax.swing.JSlider;
 
 import de.lep.rmg.model.Song;
 import de.lep.rmg.model.SongConfig;
+import de.lep.rmg.model.helper.RandomHelper;
 import de.lep.rmg.model.instruments.Instrument;
 import de.lep.rmg.model.instruments.helper.InstrumentHelper;
 import de.lep.rmg.model.notes.CType;
 import de.lep.rmg.model.notes.SChord;
 import de.lep.rmg.musicgen.IMusicGenerator;
 import de.lep.rmg.out.midi.MidiPlayer;
-import de.lep.rmg.out.midi.SequenceGenerator;
 import de.lep.rmg.out.xml.XMLException;
-import de.lep.rmg.out.xml.XMLGenerator;
-import de.lep.rmg.view.IGeneratorPanel;
 import de.lep.rmg.view.ISongChangeObserver;
-import de.lep.rmg.view.ISongChanger;
 
 /**
  * With this {@link JPanel} the user can set the configuration values (of the {@link SongConfig})
- * and start the {@link MusicGenerator}.<br>
+ * and start the {@link CanonGenerator}.<br>
  * <br>
  * Mit diesem {@link JPanel} kann der Nutzer die Startwerte des {@link SongConfig}
- * festlegen (z.B. Grundton, Musiḱinstrumente, ...) und den {@link MusicGenerator} starten.
+ * festlegen (z.B. Grundton, Musiḱinstrumente, ...) und den {@link CanonGenerator} starten.
  */
-public class GeneratorControllPanel extends JPanel implements ISongChanger, IGeneratorPanel{
+public class CanonControllPanel extends ControllPanel{
 	private static final long serialVersionUID = 1L;
-	//Beobachterliste
-	private ArrayList<ISongChangeObserver> observers;
-	//zu kontrollierender MusicGenerator
-	IMusicGenerator musicGen;
-	//MidiPlayer dem die fertige Sequence zum abspielen übergeben wird
-	MidiPlayer midiPlayer;
-	//SequenceGenerator für Midi-Ausgabe
-	SequenceGenerator seqGen = new SequenceGenerator();
-	//XMLGenerator für XML-Ausgabe
-	XMLGenerator xmlGen = new XMLGenerator();
-	//auzuzeigende Komponenten
-	JButton startButton;
-	JButton randomButton;
+	
+	//anzuzeigende Componenten, die nicht von ControllPanel geerbt werden
 	JLabel chordNrLabel;
 	JSlider chordNrSlider;
 	JLabel chordDurationLabel;
 	JSlider chordDurationSlider;
 	JLabel repeatsLabel;
 	JSlider repeatsSlider;
-	JLabel keyLabel;
-	JComboBox<String> keyComboBox;
-	JLabel keyTypeLabel;
-	JComboBox<String> keyTypeComboBox;
 	JLabel instrumentsLabel;
 	JLabel volumeLabel;
 	JComboBox<Instrument> instrument1ComboBox;
@@ -83,11 +65,11 @@ public class GeneratorControllPanel extends JPanel implements ISongChanger, IGen
 	
 	/**
 	 * erstellt ein neues JPanel
-	 * @param musicGen - {@link MusicGenerator} der den {@link Song} generiert
+	 * @param musicGen - {@link CanonGenerator} der den {@link Song} generiert
 	 * @param midiPlayer - midiPlayer zum Abspielen des generierten Songs
 	 * @param instruments - Anzahl an Instrumenten die ausgewählt werden sollen
 	 */
-	public GeneratorControllPanel(IMusicGenerator musicGen, MidiPlayer midiPlayer, int instruments){
+	public CanonControllPanel(IMusicGenerator musicGen, MidiPlayer midiPlayer, int instruments){
 		super();
 		instr = instruments;
 		if( instruments < 1 )
@@ -107,7 +89,7 @@ public class GeneratorControllPanel extends JPanel implements ISongChanger, IGen
 		randomButton.setToolTipText("Setzt zufällige Werte ohne einen Song zu generieren");
 		randomButton.addActionListener(aH);
 		chordNrLabel = new JLabel("Akkorde pro Melodie:");
-		chordNrSlider = new JSlider(1, 16, 4);
+		chordNrSlider = new JSlider(1, 12, 4);
 		chordNrSlider.setMajorTickSpacing(4);
 		chordNrSlider.setPaintTicks(true);
 		chordNrSlider.setPaintLabels(true);
@@ -251,50 +233,50 @@ public class GeneratorControllPanel extends JPanel implements ISongChanger, IGen
 				
 			}else{
 				if(aE.getSource() == randomButton){
-					Random rand = new Random();
-					//setzt komplett zufällige Werte außer bei den Lautstärken
-					chordNrSlider.setValue(rand.nextInt(16) + 1);
-					chordDurationSlider.setValue(rand.nextInt(4) + 1);
-					repeatsSlider.setValue(rand.nextInt(3) + 1);
-					//bei den ComboBoxen wird das Element Zufall nicht angewählt
-					keyComboBox.setSelectedIndex(rand.nextInt(12));
-					keyTypeComboBox.setSelectedIndex(rand.nextInt(2));
-					switch( instr ){
-					case 6:	if(instrument6ComboBox.getSelectedIndex() == instrNumber){
-						instrument6ComboBox.setSelectedIndex(rand.nextInt(instrNumber));
-					}
-					case 5:	if(instrument5ComboBox.getSelectedIndex() == instrNumber){
-						instrument5ComboBox.setSelectedIndex(rand.nextInt(instrNumber));
-					}
-					case 4:	if(instrument4ComboBox.getSelectedIndex() == instrNumber){
-						instrument4ComboBox.setSelectedIndex(rand.nextInt(instrNumber));
-					}
-					case 3:	if(instrument3ComboBox.getSelectedIndex() == instrNumber){
-						instrument3ComboBox.setSelectedIndex(rand.nextInt(instrNumber));
-					}
-					case 2:	if(instrument2ComboBox.getSelectedIndex() == instrNumber){
-						instrument2ComboBox.setSelectedIndex(rand.nextInt(instrNumber));
-					}
-					case 1:	if(instrument1ComboBox.getSelectedIndex() == instrNumber){
-						instrument1ComboBox.setSelectedIndex(rand.nextInt(instrNumber));
-					}
-					}
-					//Passt Werte an Vorgaben für SongConfig an
-					//Die Anzahl an Akkorden mal die Länge eines Akkords muss ein Vielfaches eines ganzen Takts ergeben
-					while((chordNrSlider.getValue() * chordDurationSlider.getValue()) % 4 != 0 ){
-						int currentValue = chordNrSlider.getValue();
-						if( currentValue < 12){
-							currentValue++;
-							chordNrSlider.setValue(currentValue);
-						}else{
-							currentValue--;
-							chordNrSlider.setValue(currentValue);
-						}
-					}
+					setRandomValues();
 				}
 			}
 		}
-		
+	}
+	
+	/**
+	 * setzt überall aßer bei den Lautstärken zufällige Werte
+	 */
+	private void setRandomValues(){
+		Random rand = RandomHelper.getRandom();
+		//setzt komplett zufällige Werte außer bei den Lautstärken
+		chordNrSlider.setValue( rand.nextInt(chordNrSlider.getMaximum() - chordNrSlider.getMinimum()) + chordNrSlider.getMinimum());
+		chordDurationSlider.setValue( rand.nextInt(chordDurationSlider.getMaximum() - chordNrSlider.getMinimum()) + chordDurationSlider.getMinimum());
+		repeatsSlider.setValue( rand.nextInt(repeatsSlider.getMaximum() - repeatsSlider.getMinimum()) + repeatsSlider.getMinimum());
+		//bei den ComboBoxen wird das Element Zufall nicht angewählt
+		keyComboBox.setSelectedIndex(rand.nextInt(12));
+		keyTypeComboBox.setSelectedIndex(rand.nextInt(2));
+		switch( instr ){
+		case 6:
+			instrument6ComboBox.setSelectedIndex(rand.nextInt(instrNumber));
+		case 5:
+			instrument5ComboBox.setSelectedIndex(rand.nextInt(instrNumber));
+		case 4:
+			instrument4ComboBox.setSelectedIndex(rand.nextInt(instrNumber));
+		case 3:
+			instrument3ComboBox.setSelectedIndex(rand.nextInt(instrNumber));
+		case 2:
+			instrument2ComboBox.setSelectedIndex(rand.nextInt(instrNumber));
+		case 1:
+			instrument1ComboBox.setSelectedIndex(rand.nextInt(instrNumber));
+		}
+		//Passt Werte an Vorgaben für SongConfig an
+		//Die Anzahl an Akkorden mal die Länge eines Akkords muss ein Vielfaches eines ganzen Takts ergeben
+		while((chordNrSlider.getValue() * chordDurationSlider.getValue()) % 4 != 0 ){
+			int currentValue = chordNrSlider.getValue();
+			if( currentValue < 12){
+				currentValue++;
+				chordNrSlider.setValue(currentValue);
+			}else{
+				currentValue--;
+				chordNrSlider.setValue(currentValue);
+			}
+		}
 	}
 	
 	private void startMusicGenerator(){
@@ -381,29 +363,6 @@ public class GeneratorControllPanel extends JPanel implements ISongChanger, IGen
 		}
 		//spielt den Song ab
 		midiPlayer.play(seq);
-	}
-	
-	/**
-	 * registriert einen Beobachter
-	 * @param sco : Beobachter der registriert werden soll
-	 */
-	@Override
-	public void addSongChangeObserver(ISongChangeObserver sco) {
-		observers.add(sco);
-	}
-	
-	/**
-	 * entfernt einen Beobachter
-	 * @param sco : Beobachter der entfernt werden soll
-	 */
-	@Override
-	public void removeSongChangeObserver(ISongChangeObserver sco) {
-		observers.remove(sco);
-	}
-
-	@Override
-	public void setGenerator(IMusicGenerator musicGen) {
-		this.musicGen = musicGen;
 	}
 	
 }

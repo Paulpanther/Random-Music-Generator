@@ -32,7 +32,7 @@ public class FugenMelodyGenerator implements IFugenMelodyGenerator {
 	
 	@Override
 	public ArrayList<INote> generateSubject(SongConfig config, ArrayList<INote> rhythm) {
-		INote lastNote = new SNote(config.getKey().getKeynote(), 3, config.getMeasureDivision());
+		INote lastNote = new SNote(config.getKey().getKeynote(), standardOctave, config.getMeasureDivision());
 		for(INote note : rhythm){
 			if(note instanceof IRealNote){//else assume it is a Rest
 				IRealNote thisNote = (IRealNote) note;
@@ -54,15 +54,67 @@ public class FugenMelodyGenerator implements IFugenMelodyGenerator {
 	public ArrayList<INote> generateAntiSubject(SongConfig config, ArrayList<INote> subject) {
 		ArrayList<INote> antiSubject = RhythmGenerator.generateAntiMotif(config, subject);
 		
-		// TODO Auto-generated method stub
+		int noteCounter = 0;//zählt die bereits untersuchten Noten des subjects
+		int subjectDurCounter = 0;//zählt die Gesamtlänge der bereits untersuchten Noten des subjects
+		int durCounter = 0;//zählt die Gesamtlänge der Noten im antiSubject
+		ArrayList<INote> playingNotes = new ArrayList<INote>();
+		INote lastNote = subject.get( subject.size() - 1 );
 		
+		for( INote inote : antiSubject ) {
+			durCounter += inote.getDuration();
+			while(subjectDurCounter <= durCounter){
+				playingNotes.add(subject.get(noteCounter));
+				subjectDurCounter += subject.get(noteCounter).getDuration();
+				noteCounter++;
+			}
+			
+			if ( inote instanceof IRealNote ) {
+				IRealNote thisNote = (IRealNote) inote;
+				if(lastNote instanceof IRealNote){
+					setNextTone(config, thisNote, (IRealNote)lastNote);
+				}else{
+					thisNote.setTone(config.getKey().getKeynote());
+					thisNote.setOctave(standardOctave);
+					NoteHelper.addInterval(thisNote, rand.nextInt(3)*2, config.getKey());
+				}
+				for( INote subjectNote : playingNotes ){
+					if( subjectNote instanceof IRealNote ){
+						//TODO subject mit einbeziehen
+					}
+				}
+			}
+			lastNote = inote;
+			for( int index = playingNotes.size() - 1; index >= 0; index-- ) {
+				if(index != 0)
+					playingNotes.remove(index);
+				else
+					if( subjectDurCounter <= durCounter ) {
+						playingNotes.remove(index);
+					}
+			}
+		}
 		return antiSubject;
 	}
 
 	@Override
 	public ArrayList<INote> generateSubVoice(SongConfig config, FugenInfo fugenInfo, int length) {
-		// TODO Auto-generated method stub
-		return null;
+		INote lastNote = fugenInfo.getAntiSubjectList().get( fugenInfo.getAntiSubjectList().size() - 1 );
+		ArrayList<INote> rhythm = RhythmGenerator.generateMotif(config, length);
+		for(INote note : rhythm){
+			if(note instanceof IRealNote){//else assume it is a Rest
+				IRealNote thisNote = (IRealNote) note;
+				if(lastNote instanceof IRealNote){
+					setNextTone(config, thisNote, (IRealNote)lastNote);
+				}else{
+					thisNote.setTone(config.getKey().getKeynote());
+					thisNote.setOctave(standardOctave);
+					NoteHelper.addInterval(thisNote, rand.nextInt(3)*2, config.getKey());
+				}
+			}
+			lastNote = note;
+		}
+		//TODO subject und antiSubject mit einbeziehen
+		return rhythm;
 	}
 	
 	/**
@@ -77,8 +129,8 @@ public class FugenMelodyGenerator implements IFugenMelodyGenerator {
 	private IRealNote setNextTone(SongConfig config, IRealNote thisNote, IRealNote lastNote){
 		ArrayList<PercentPair> allowedIntervals = getAllowedIntervals(config, lastNote);
 		int interval = PercentPair.getRandomValue( allowedIntervals.toArray(null), rand);
-		thisNote.setTone(config.getKey().getKeynote());
-		thisNote.setOctave(standardOctave);
+		thisNote.setTone(lastNote.getTone());
+		thisNote.setOctave(lastNote.getOctave());
 		NoteHelper.addInterval(thisNote, interval, config.getKey());
 		return thisNote;
 	}
@@ -87,9 +139,9 @@ public class FugenMelodyGenerator implements IFugenMelodyGenerator {
 	 * Gibt alle Intervalle die vom {@link SongConfig} und gleichzeitig vom Tonbereich her erlaubt sind zurück.<br>
 	 * Rückgabetyp ist dabei eine ArrayList von {@link PercentPair}s, wodurch auch die entsprechenden Wahscheinlichkeiten
 	 * transportiert werden.
-	 * @param config
-	 * @param lastNote
-	 * @return
+	 * @param config - das {@link SongConfig}
+	 * @param lastNote - die Note, in Bezug auf die das Interval angegeben wird
+	 * @return Liste von möglichen Intervallen
 	 */
 	private ArrayList<PercentPair> getAllowedIntervals(SongConfig config, IRealNote lastNote){
 		int previous = NoteHelper.getInterval( config.getKey().getKeynote() + standardOctave * 12, lastNote.getTone() + lastNote.getOctave() *12);

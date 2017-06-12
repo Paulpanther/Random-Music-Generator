@@ -14,13 +14,18 @@ import de.lep.rmg.model.notes.Rest;
 import de.lep.rmg.musicgen.IMusicGenerator;
 import de.lep.rmg.musicgen.RhythmGenerator;
 import de.lep.rmg.musicgen.helper.MelodyHelper;
+import de.lep.rmg.out.midi.MidiPlayer;
+import de.lep.rmg.view.panels.ControllPanel;
+import de.lep.rmg.view.panels.FugenControllPanel;
 
 public class FugenGenerator implements IMusicGenerator {
 	
 	IFugenMelodyGenerator melGen;
+	MidiPlayer midiPlayer;
 	
-	public FugenGenerator( IFugenMelodyGenerator FMG ) {
+	public FugenGenerator( MidiPlayer midiPlayer, IFugenMelodyGenerator FMG ) {
 		melGen = FMG;
+		this.midiPlayer = midiPlayer;
 	}
 	
 	/**
@@ -46,7 +51,7 @@ public class FugenGenerator implements IMusicGenerator {
 			voices = 6;
 		
 		//generiere Rhythmus für Hauptmotiv
-		ArrayList<INote> rhythm = RhythmGenerator.generateMotif(config);
+		ArrayList<INote> rhythm = RhythmGenerator.generateMotif(config, 1);//1: höhere Werte nur für freie Stimmen
 		//generiere Thema und Gegenthema
 		ArrayList<INote> themeList = melGen.generateSubject(config, rhythm);//Das Hauptthema
 		ArrayList <INote> antiThemeList = melGen.generateAntiSubject(config, themeList);//Das Gegenthema
@@ -241,7 +246,12 @@ public class FugenGenerator implements IMusicGenerator {
 
 	@Override
 	public String getGeneratorName() {
-		return "Fugengenerator";
+		return "Fuge";
+	}
+
+	@Override
+	public ControllPanel getGeneratorPanel() {
+		return new FugenControllPanel(this, midiPlayer);
 	}
 
 }

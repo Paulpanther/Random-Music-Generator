@@ -141,6 +141,10 @@ public class SongConfig {
 		this.repeats = repeats;
 		this.melodyNr = melodyNr;
 		this.chordDuration = chordDuration;
+		if(chordDuration == 3){
+			beats = 3;
+			beatType = 3;
+		}
 		this.key = key;
 		fifth = ChordHelper.getCircleOfFifthPos(key);
 		if(instruments != null && instruments.length != 0){

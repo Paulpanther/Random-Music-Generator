@@ -9,18 +9,23 @@ import de.lep.rmg.model.SongConfig;
 import de.lep.rmg.model.notes.Rest;
 import de.lep.rmg.model.notes.SChord;
 import de.lep.rmg.model.notes.SNote;
+import de.lep.rmg.out.midi.MidiPlayer;
+import de.lep.rmg.view.panels.CanonControllPanel;
+import de.lep.rmg.view.panels.ControllPanel;
 
 /**
  * Unsere Implementation des {@link IMusicGenerator}.<br>
  * Controller für {@link ChordGenerator}, {@link RhythmGenerator} und {@link MelodyGenerator}.
  *
  */
-public class MusicGenerator implements IMusicGenerator {
+public class CanonGenerator implements IMusicGenerator {
 	
 	ICanonMelodyGenerator melGen;
+	MidiPlayer midiPlayer;
 
-	public MusicGenerator(ICanonMelodyGenerator melGen) {
+	public CanonGenerator(MidiPlayer midiPlayer, ICanonMelodyGenerator melGen) {
 		this.melGen = melGen;
+		this.midiPlayer = midiPlayer;
 	}
 	
 	/**
@@ -111,8 +116,11 @@ public class MusicGenerator implements IMusicGenerator {
 	
 	@Override
 	public String getGeneratorName() {
-		String name = "Kanon ";
-		name += melGen.getGeneratorName();
-		return name;
+		return "Kanon";
+	}
+
+	@Override
+	public ControllPanel getGeneratorPanel() {
+		return new CanonControllPanel(this, midiPlayer, 3);
 	}
 }

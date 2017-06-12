@@ -19,7 +19,7 @@ import de.lep.rmg.model.notes.SNote;
  * Klasse zum generieren des Rhythmus.<br>
  * Enthält die Methode {@link RhythmGenerator#generateRhythm(SongConfig)}, welche den Rhythmus generiert.
  *
- * @see MusicGenerator Controller für diese Klasse
+ * @see CanonGenerator Controller für diese Klasse
  */
 public class RhythmGenerator {
 	
@@ -66,9 +66,10 @@ public class RhythmGenerator {
 	/**
 	 * 
 	 * @param config - zum {@link Song} gehörendes {@link SongConfig}
+	 * @param length - Länge des rhythmischen Motivs in vielfachen der Länge des Themas (Beats * ChordNr * MeasureDivision)
 	 * @return rhytmisches Motiv als ArrayList<INote>
 	 */
-	public static ArrayList<INote> generateMotif( SongConfig config ) {
+	public static ArrayList<INote> generateMotif( SongConfig config, int length ) {
 		ArrayList<INote> motif = new ArrayList<INote>();
 		int measure = config.getBeats() * config.getMeasureDivision();
 		for(int i = 0; i < config.getChordNr(); i++){
