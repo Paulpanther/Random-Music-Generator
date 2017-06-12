@@ -45,6 +45,7 @@ public class GeneratorMenu extends JMenu {
 			window.remove(genPanel);
 			window.add(musicGen.getGeneratorPanel(), 0);
 			genPanel = musicGen.getGeneratorPanel();
+			window.repaint();
 		}
 		
 	}
