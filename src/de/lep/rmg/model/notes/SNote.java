@@ -115,9 +115,9 @@ public class SNote implements INote, IRealNote {
 	public String toString() {
 		String stepStr = NoteHelper.getToneString( this );
 		if( NoteHelper.getAlter( this ) == -1 )
-			stepStr = "b";
+			stepStr += "b";
 		else if( NoteHelper.getAlter( this ) == 1 )
-			stepStr = "#";
+			stepStr += "#";
 		return "SNote [tone=" + tone + " (" + stepStr + "), octave=" + octave + ", duration=" + duration + "]";
 	}
 	
