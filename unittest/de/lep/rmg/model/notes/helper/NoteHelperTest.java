@@ -45,7 +45,7 @@ public class NoteHelperTest {
 		assertEquals( SNote.C - 12, NoteHelper.addInterval( SNote.D, /*Sekunde + Oktave abwärts*/-8, new SChord(SNote.A, CType.MINOR)));
 		assertEquals( SNote.GIS + 24, NoteHelper.addInterval( SNote.D, /*Quarte + 2 Oktaven*/17, new SChord(SNote.C, CType.AUG)));
 		assertEquals( SNote.AIS, NoteHelper.addInterval( SNote.E, /*Qunite*/4, new SChord(SNote.F, CType.MAJOR)));
-		assertEquals( SNote.D, NoteHelper.addInterval(SNote.B, /*Sexte abwärts*/-5, new SChord(SNote.D, CType.MINOR)));
+		assertEquals( SNote.D, NoteHelper.addInterval(SNote.AIS, /*Sexte abwärts*/-5, new SChord(SNote.D, CType.MINOR)));
 	}
 	
 	/**
@@ -119,7 +119,7 @@ public class NoteHelperTest {
 		note.setTone( SNote.F);
 		note.setOctave( 3 );
 		NoteHelper.addInterval(note, /*Septime*/6, cMinorChord);
-		assertEquals( SNote.DIS, note.getOctave());
+		assertEquals( SNote.DIS, note.getTone());
 		assertEquals( 4, note.getOctave());
 		
 		note.setTone( SNote.G);
