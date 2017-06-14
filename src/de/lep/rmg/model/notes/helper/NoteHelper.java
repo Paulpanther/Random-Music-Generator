@@ -200,8 +200,9 @@ public class NoteHelper {
 					interval = 2;
 				else if(steps == 5)
 					interval = 3;
-				else if(steps == 6){
+				else if(steps == 6){//ohne Tonart nicht eindeutig
 					interval = 4;
+					System.out.println("Halbtonschrittdifferenz 6 in NoteHelper#getInterval(int, int)");
 				}else if(steps == 7)
 					interval = 4;
 				else if(steps < 10)
@@ -214,8 +215,9 @@ public class NoteHelper {
 					interval = -2;
 				else if(steps == -5)
 					interval = -3;
-				else if(steps == -6){
+				else if(steps == -6){//ohne Tonart nicht eindeutig
 					interval = -4;
+					System.out.println("Halbtonschrittdifferenz 6 in NoteHelper#getInterval(int, int)");
 				}else if(steps == -7)
 					interval = -4;
 				else if(steps > -10)
@@ -235,6 +237,8 @@ public class NoteHelper {
 	 * 	0 = Prime; 1 = Sekunde; ...; 7 = Oktave
 	 * @param key Tonart, die zugrundegelegt wird
 	 * @return Tonhöhe des Intervals in Halbtonschritten
+	 * 
+	 * @see NoteHelperTest#testAddInterval()
 	 */
 	public static int addInterval(int tone, int interval, SChord key){
 		int retTone = tone;
@@ -258,6 +262,8 @@ public class NoteHelper {
 	 * @param note - Note deren Tonhöhe verändert werden soll
 	 * @param interval - Interval, um das verändert wird. 0 == Prime, 1 == Sekunde, ...
 	 * @param key - Grundetonart, die zugrundegelegt wird. Bestimmt den Intervaltyp: klein, groß, rein, ...
+	 * 
+	 * @see NoteHelperTest#testAddIntervalRealNote()
 	 */
 	public static void addInterval(IRealNote note, int interval, SChord key){
 		int[] scale = ChordHelper.getScale(key);
