@@ -106,35 +106,35 @@ public class FugenControllPanel extends ControllPanel{
 
 		//initializing all Instrument-ComboBoxes
 		instrument6ComboBox = new JComboBox<Instrument>(InstrumentHelper.getAllInstrIncNull());
-		instrument6ComboBox.setSelectedIndex(/*Random*/ InstrumentHelper.getAllInstrNumber());
+		instrument6ComboBox.setSelectedIndex(/*Flügel*/ 4);
 		volume6Slider = new JSlider(0, 120, 100);
 		volume6Slider.setMajorTickSpacing(24);
 		volume6Slider.setMinorTickSpacing(8);
 		volume6Slider.setPaintTicks(true);
 		volume6Slider.setPaintLabels(true);
 		instrument5ComboBox = new JComboBox<Instrument>(InstrumentHelper.getAllInstrIncNull());
-		instrument5ComboBox.setSelectedIndex(InstrumentHelper.getAllInstrNumber());
+		instrument5ComboBox.setSelectedIndex(4);
 		volume5Slider = new JSlider(0, 120, 100);
 		volume5Slider.setMajorTickSpacing(24);
 		volume5Slider.setMinorTickSpacing(8);
 		volume5Slider.setPaintTicks(true);
 		volume5Slider.setPaintLabels(true);
 		instrument4ComboBox = new JComboBox<Instrument>(InstrumentHelper.getAllInstrIncNull());
-		instrument4ComboBox.setSelectedIndex(InstrumentHelper.getAllInstrNumber());
+		instrument4ComboBox.setSelectedIndex(4);
 		volume4Slider = new JSlider(0, 120, 100);
 		volume4Slider.setMajorTickSpacing(24);
 		volume4Slider.setMinorTickSpacing(8);
 		volume4Slider.setPaintTicks(true);
 		volume4Slider.setPaintLabels(true);
 		instrument3ComboBox = new JComboBox<Instrument>(InstrumentHelper.getAllInstrIncNull());
-		instrument3ComboBox.setSelectedIndex(InstrumentHelper.getAllInstrNumber());
+		instrument3ComboBox.setSelectedIndex(4);
 		volume3Slider = new JSlider(0, 120, 100);
 		volume3Slider.setMajorTickSpacing(24);
 		volume3Slider.setMinorTickSpacing(8);
 		volume3Slider.setPaintTicks(true);
 		volume3Slider.setPaintLabels(true);
 		instrument2ComboBox = new JComboBox<Instrument>(InstrumentHelper.getAllInstrIncNull());
-		instrument2ComboBox.setSelectedIndex(InstrumentHelper.getAllInstrNumber());
+		instrument2ComboBox.setSelectedIndex(4);
 		volume2Slider = new JSlider(0, 120, 100);
 		volume2Slider.setMajorTickSpacing(24);
 		volume2Slider.setMinorTickSpacing(8);
@@ -194,20 +194,20 @@ public class FugenControllPanel extends ControllPanel{
 		keyComboBox.setSelectedIndex(rand.nextInt(keyComboBox.getItemCount() - 1));//12 mögliche Grundtöne
 		keyTypeComboBox.setSelectedIndex(rand.nextInt(keyTypeComboBox.getItemCount() - 1));//Dur oder Moll
 		instrumentNrSlider.setValue( rand.nextInt( instrumentNrSlider.getMaximum() - instrumentNrSlider.getMinimum()) + instrumentNrSlider.getMinimum());//ChangeListener wird bei verändertem Wert automatisch informiertt
-		switch( instrumentNrSlider.getValue() ){
-		case 6:	
-			instrument6ComboBox.setSelectedIndex(rand.nextInt(InstrumentHelper.getAllInstrNumber()));
-		case 5:
-			instrument5ComboBox.setSelectedIndex(rand.nextInt(InstrumentHelper.getAllInstrNumber()));
-		case 4:
-			instrument4ComboBox.setSelectedIndex(rand.nextInt(InstrumentHelper.getAllInstrNumber()));
-		case 3:
-			instrument3ComboBox.setSelectedIndex(rand.nextInt(InstrumentHelper.getAllInstrNumber()));
-		case 2:
-			instrument2ComboBox.setSelectedIndex(rand.nextInt(InstrumentHelper.getAllInstrNumber()));
-		case 1:
-			instrument1ComboBox.setSelectedIndex(rand.nextInt(InstrumentHelper.getAllInstrNumber()));
-		}
+//		switch( instrumentNrSlider.getValue() ){
+//		case 6:	
+//			instrument6ComboBox.setSelectedIndex(rand.nextInt(InstrumentHelper.getAllInstrNumber()));
+//		case 5:
+//			instrument5ComboBox.setSelectedIndex(rand.nextInt(InstrumentHelper.getAllInstrNumber()));
+//		case 4:
+//			instrument4ComboBox.setSelectedIndex(rand.nextInt(InstrumentHelper.getAllInstrNumber()));
+//		case 3:
+//			instrument3ComboBox.setSelectedIndex(rand.nextInt(InstrumentHelper.getAllInstrNumber()));
+//		case 2:
+//			instrument2ComboBox.setSelectedIndex(rand.nextInt(InstrumentHelper.getAllInstrNumber()));
+//		case 1:
+//			instrument1ComboBox.setSelectedIndex(rand.nextInt(InstrumentHelper.getAllInstrNumber()));
+//		}
 	}
 
 	private void startMusicGenerator(){

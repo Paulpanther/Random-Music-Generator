@@ -26,6 +26,7 @@ import de.lep.rmg.musicgen.fuge.FugenMelodyGenerator;
 import de.lep.rmg.out.midi.MidiPlayer;
 import de.lep.rmg.out.midi.TrackFactory;
 import de.lep.rmg.out.xml.XMLGenerator;
+import de.lep.rmg.view.ISongChangeObserver;
 //import de.lep.rmg.out.midi.SequenceGenerator;
 //import de.lep.rmg.out.xml.XMLException;
 //import de.lep.rmg.out.xml.XMLGenerator;
@@ -70,15 +71,18 @@ public class Controller {
 		CanonControllPanel ccP = new CanonControllPanel(canonGen, player, 3);//GeneratorControllPanel with 3 Instruments to choose
 		window.add(ccP);
 		window.add(new PlayerControllPanel(player));
-//		window.add(new SaveLoadPanel(song, player, gcP));
 		
 		//MenuLeiste
+		ArrayList<ISongChangeObserver> scoList = new ArrayList<ISongChangeObserver>();
 		JMenuBar menuBar = new JMenuBar();
-		menuBar.add(new FileMenu(/*song*/ null, player, ccP));
-		menuBar.add(new GeneratorMenu(window, ccP, musicGenList));
+		FileMenu fileMenu = new FileMenu(/*song*/ null, player, ccP);
+		menuBar.add(fileMenu);
+		scoList.add(fileMenu);
+		menuBar.add(new GeneratorMenu(window, ccP, musicGenList, scoList));
 		window.setJMenuBar(menuBar);
 		
-//		SongConfig config = new SongConfig();
+		ccP.addSongChangeObserver(fileMenu);
+		
 		//stellt Fenster fertig
 		window.pack();
 	}
