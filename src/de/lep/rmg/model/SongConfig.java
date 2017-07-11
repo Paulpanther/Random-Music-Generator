@@ -177,11 +177,11 @@ public class SongConfig {
 	
 	private void alterIntervalProbabilities(Random rand){
 		Float[] intervalProbs = new Float[5];
-		intervalProbs[0] = (float) ((rand.nextInt(20) + 7.5) / 100);//( 17,5 +- 10 )%
- 		intervalProbs[1] = (float) ((rand.nextInt(20) + 15) / 100);//( 25 +- 10 )%
- 		intervalProbs[2] = (float) ((rand.nextInt(20) + 12.5) / 100);//( 22,5 +- 10 )%
- 		intervalProbs[3] = (float) ((rand.nextInt(15) + 5) / 100);//( 12,5 +- 7,5 )%
- 		intervalProbs[4] = (float) ((rand.nextInt(20) + 12.5) / 100);//( 22,5 +- 10 )%
+		intervalProbs[0] = (float) ((rand.nextInt(25) + 2.5) / 100);//( 15 +- 12.5 )%
+ 		intervalProbs[1] = (float) ((rand.nextInt(40) + 5.0) / 100);//( 25 +- 20 )%
+ 		intervalProbs[2] = (float) ((rand.nextInt(35) + 5.0) / 100);//( 22,5 +- 17,5 )%
+ 		intervalProbs[3] = (float) ((rand.nextInt(25) + 2.5) / 100);//( 15 +- 12.5 )%
+ 		intervalProbs[4] = (float) ((rand.nextInt(35) + 5.0) / 100);//( 22,5 +- 17,5 )%
 		float sum = 0;
 		for(float percent : intervalProbs){
 			sum += percent;
@@ -195,26 +195,26 @@ public class SongConfig {
 	
 	private void alterDurationProbabilities(Random rand){
 		//P(4)(8tel) ist 10 bis 50 Prozent
-				noteDurations[0] = new PercentPair(noteDurations[0].getValue(), (rand.nextInt(30) + 15) / 100f);
-				
-				//P(8)(4tel ist 10 bis 50 Prozent
-				noteDurations[1] = new PercentPair(noteDurations[1].getValue(), (rand.nextInt(30) + 15)/ 100f);
-				
-				//P(4) + P(8) muss größer als 40 Prozent und kleiner als 70 Prozent sein
-				while( noteDurations[0].getPercent() + noteDurations[1].getPercent() < 0.4f ){
-					noteDurations[0] = new PercentPair(noteDurations[0].getValue(), noteDurations[0].getPercent() + 0.05f);
-					noteDurations[1] = new PercentPair(noteDurations[1].getValue(), noteDurations[1].getPercent() + 0.05f);
-				}
-				while( noteDurations[0].getPercent() + noteDurations[1].getPercent() > 0.7f ){
-					noteDurations[0] = new PercentPair(noteDurations[0].getValue(), noteDurations[0].getPercent() - 0.05f);
-					noteDurations[1] = new PercentPair(noteDurations[1].getValue(), noteDurations[1].getPercent() - 0.05f);
-				}
-				
-				//P(12)(3/8tel) = 0.2 - (P(2) - P(6)); P(2) + P(6) + P(12) = 0.2
-				noteDurations[2] = new PercentPair(noteDurations[2].getValue(), (rand.nextInt(20) + 5) / 100f);
-				
-				//P(16)(halbe) ist 20 bis 40 Prozent
-				noteDurations[3] = new PercentPair(noteDurations[3].getValue(), 1f - noteDurations[0].getPercent() - noteDurations[1].getPercent() - noteDurations[2].getPercent());
+		noteDurations[0] = new PercentPair(noteDurations[0].getValue(), (rand.nextInt(30) + 15) / 100f);
+
+		//P(8)(4tel ist 10 bis 50 Prozent
+		noteDurations[1] = new PercentPair(noteDurations[1].getValue(), (rand.nextInt(30) + 15)/ 100f);
+
+		//P(4) + P(8) muss größer als 40 Prozent und kleiner als 70 Prozent sein
+		while( noteDurations[0].getPercent() + noteDurations[1].getPercent() < 0.4f ){
+			noteDurations[0] = new PercentPair(noteDurations[0].getValue(), noteDurations[0].getPercent() + 0.05f);
+			noteDurations[1] = new PercentPair(noteDurations[1].getValue(), noteDurations[1].getPercent() + 0.05f);
+		}
+		while( noteDurations[0].getPercent() + noteDurations[1].getPercent() > 0.7f ){
+			noteDurations[0] = new PercentPair(noteDurations[0].getValue(), noteDurations[0].getPercent() - 0.05f);
+			noteDurations[1] = new PercentPair(noteDurations[1].getValue(), noteDurations[1].getPercent() - 0.05f);
+		}
+
+		//P(12)(3/8tel) = 0.2 - (P(2) - P(6)); P(2) + P(6) + P(12) = 0.2
+		noteDurations[2] = new PercentPair(noteDurations[2].getValue(), (rand.nextInt(20) + 5) / 100f);
+
+		//P(16)(halbe) ist 20 bis 40 Prozent
+		noteDurations[3] = new PercentPair(noteDurations[3].getValue(), 1f - noteDurations[0].getPercent() - noteDurations[1].getPercent() - noteDurations[2].getPercent());
 	}
 	
 	void printProbabilities(){
@@ -222,10 +222,11 @@ public class SongConfig {
 		for(PercentPair percent : intervals) {
 			System.out.println("Interval " + percent.getValue() + ": " + percent.getPercent());
 		}
-		System.out.println("Notenlängen: ");
+		System.out.println("\nNotenlängen: ");
 		for(PercentPair percent : noteDurations) {
 			System.out.println("Dauer " + percent.getValue() + ": " + percent.getPercent());
 		}
+		System.out.println("");
 	}
 	
 	/*#############################################################################
