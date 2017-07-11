@@ -105,7 +105,7 @@ public class CanonGenerator implements IMusicGenerator {
 			song.add( part );
 		}
 		
-		System.out.println( song.toString() );
+		//System.out.println( song.toString() );
 		return song;
 	}
 

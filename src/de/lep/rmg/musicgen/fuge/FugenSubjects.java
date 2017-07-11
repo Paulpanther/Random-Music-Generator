@@ -13,12 +13,12 @@ import de.lep.rmg.model.notes.INote;
  * an untergeordnete Methoden weiterzugeben.
  * 
  */
-public class FugenInfo {
+public class FugenSubjects {
 	private ArrayList<INote> subjectList, antiSubjectList;
 	private Part subjectPart, antiSubjectPart;
 	private int voices;
 	
-	protected FugenInfo(ArrayList<INote> subjectList,ArrayList<INote> antiSubjectList,
+	protected FugenSubjects(ArrayList<INote> subjectList,ArrayList<INote> antiSubjectList,
 			Part subjectPart, Part antiSubjectPart, int voices){
 		this.subjectList = subjectList;
 		this.antiSubjectList = antiSubjectList;
