@@ -92,9 +92,9 @@ public class RhythmGenerator {
 		ArrayList<INote> antiMotif = new ArrayList<INote>();//Rhythmus der zurückgegeben wird
 		int measure = config.getBeats() * config.getMeasureDivision();//im Measure verbleibende Dauer
 		int duration = 0;//Dauer einer noch nicht hinzugefügten Note
-		int[] possibleDurs = new int[config.getNoteDurations().length];//mögliche Notenlängen, Wahrscheinlichkeiten aus SongConfig werden nicht gebraucht
+		int[] possibleDurs = new int[config.getNoteDurations().size()];//mögliche Notenlängen, Wahrscheinlichkeiten aus SongConfig werden nicht gebraucht
 		for(int i = 0; i < possibleDurs.length; i++){
-			possibleDurs[i] = config.getNoteDurations()[i].getValue();
+			possibleDurs[i] = config.getNoteDurations().get(i).getValue();
 		}
 		int min = possibleDurs[0];//Maximallänge für Fall kurze Note und Grenze für verbleibende Taktlänge
 		if( possibleDurs[1] < min*2 ){
@@ -206,7 +206,10 @@ public class RhythmGenerator {
 		List<Integer> rhythm = new ArrayList<Integer>();
 
 		//Die möglichen Dauern sind in SongConfig#getNoteDurations() abgelegt
-		PercentPair[] allNotes = config.getNoteDurations();
+		ArrayList<PercentPair> allNotes = new ArrayList<PercentPair>();
+		for(PercentPair pair : config.getNoteDurations()){
+			allNotes.add(pair);
+		}
 
 		//Speichert die 'unbenutzte' Länge
 		int left = duration;
