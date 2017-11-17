@@ -17,7 +17,7 @@ public class MelodyHelper {
 	
 	/**
 	 * Transponiert eine Liste von Noten, um das angegebene Interval und gibt
-	 * das Ergebnis in einer neuen List zurück. Das Original bleibt erhalten.
+	 * das Ergebnis in einer neuen Liste zurück. Das Original bleibt erhalten.
 	 * Funktioniert nur für Noten, die {@link IRealNote} implementieren, andere
 	 * Noten werden wie Pausen behandelt und bleiben unverändert.
 	 * @param notes - Liste der zu Transponierenden Noten
@@ -26,13 +26,16 @@ public class MelodyHelper {
 	 * @return die transponierte Melodie
 	 */
 	public static ArrayList<INote> transpone( ArrayList<INote> notes, int interval, SChord key ){
-		ArrayList<INote> transposition = new ArrayList<INote>();
+		ArrayList<INote> transposition = new ArrayList<INote>(notes.size());
 		for(INote note: notes){
 			if(note instanceof IRealNote){
 				IRealNote realNote = (IRealNote) note;
-				NoteHelper.addInterval(realNote, interval, key);
+				IRealNote transponedNote = (IRealNote) realNote.clone();
+				NoteHelper.addInterval(transponedNote, interval, key);
+			transposition.add(transponedNote);
+			}else{
+				transposition.add(note.clone());
 			}
-			transposition.add(note);
 		}
 		return transposition;
 	}
