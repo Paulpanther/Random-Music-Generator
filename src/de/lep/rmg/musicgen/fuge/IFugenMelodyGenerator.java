@@ -36,5 +36,5 @@ public interface IFugenMelodyGenerator {
 	 * @param length - Dauer der freien Stimme in Vielfachen der Länge des Themas
 	 * @return freie Stimme als ArrayList
 	 */
-	public ArrayList<INote> generateSubVoice( SongConfig config, FugenInfo fugenInfo, int length );
+	public ArrayList<INote> generateSubVoice( SongConfig config, FugenSubjects fugenSubjects, int length );
 }

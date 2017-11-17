@@ -62,7 +62,7 @@ public class FugenMelodyGenerator implements IFugenMelodyGenerator {
 		
 		for( INote inote : antiSubject ) {
 			durCounter += inote.getDuration();
-			while(subjectDurCounter <= durCounter){
+			while(subjectDurCounter < durCounter){
 				playingNotes.add(subject.get(noteCounter));
 				subjectDurCounter += subject.get(noteCounter).getDuration();
 				noteCounter++;
@@ -97,8 +97,8 @@ public class FugenMelodyGenerator implements IFugenMelodyGenerator {
 	}
 
 	@Override
-	public ArrayList<INote> generateSubVoice(SongConfig config, FugenInfo fugenInfo, int length) {
-		INote lastNote = fugenInfo.getAntiSubjectList().get( fugenInfo.getAntiSubjectList().size() - 1 );
+	public ArrayList<INote> generateSubVoice(SongConfig config, FugenSubjects fugenSubjects, int length) {
+		INote lastNote = fugenSubjects.getAntiSubjectList().get( fugenSubjects.getAntiSubjectList().size() - 1 );
 		ArrayList<INote> rhythm = RhythmGenerator.generateMotif(config, length);
 		for(INote note : rhythm){
 			if(note instanceof IRealNote){//else assume it is a Rest
@@ -128,7 +128,7 @@ public class FugenMelodyGenerator implements IFugenMelodyGenerator {
 	 */
 	private IRealNote setNextTone(SongConfig config, IRealNote thisNote, IRealNote lastNote){
 		ArrayList<PercentPair> allowedIntervals = getAllowedIntervals(config, lastNote);
-		int interval = PercentPair.getRandomValue( allowedIntervals.toArray(null), rand);
+		int interval = PercentPair.getRandomValue( allowedIntervals.toArray(new PercentPair[0]), rand);
 		thisNote.setTone(lastNote.getTone());
 		thisNote.setOctave(lastNote.getOctave());
 		NoteHelper.addInterval(thisNote, interval, config.getKey());
@@ -151,7 +151,7 @@ public class FugenMelodyGenerator implements IFugenMelodyGenerator {
 			intervals.add(pair.getValue());
 		}
 		for(int value: intervals){
-			if(!(previous + value <= upperMaxIntervalToKey)){//Interval nach oben
+			if(previous + value <= upperMaxIntervalToKey){//Interval nach oben
 				allowed.add(new PercentPair(value, config.getInterval(value).getPercent()));
 			}
 			if(previous - value >= lowerMaxIntervalToKey && value != 0){//Interval nach unten
