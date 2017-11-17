@@ -117,16 +117,7 @@ public class FugenGenerator implements IMusicGenerator {
 		ArrayList<Part> order = (ArrayList<Part>) parts.clone();//Objekte in order und parts sind die selben
 		Collections.shuffle(order);
 		//Intervalle der Stimmen zur Tonhöhe im FugenInfo
-		ArrayList<Integer> intervals = new ArrayList<Integer>();
-		for( int partnr = 0; partnr < order.size(); partnr++ ){
-			int pitch = parts.indexOf(order.get(partnr));
-			int interval = 7 * pitch/2;//bei 1/2; 3/2; ... wird abgerundet auf 0; 1, ...
-			if(partnr % 2 == 0){//Tonikaeinsatz; Dux
-				intervals.add(interval);
-			}else{//Dominanteinsatz; Comes
-				intervals.add(interval - 3);
-			}
-		}
+		ArrayList<Integer> intervals = intervals(parts, order);
 		
 		//falls dies der Anfang des Stücks ist, werden die untergeordneten Stimmen mit Pausen aufgefüllt
 		if(parts.get(0).isEmpty()){
@@ -160,7 +151,7 @@ public class FugenGenerator implements IMusicGenerator {
 			}
 		}
 		// Rest mit freien Stimmen auffüllen
-		for(int partnr = 0; partnr < parts.size() - 2; partnr++) {//letzte zwei Parts sind bereits fertig, daher partnr < parts.size() - 2
+		for(int partnr = 0; partnr < order.size() - 2; partnr++) {//letzte zwei Parts sind bereits fertig, daher partnr < parts.size() - 2 2
 			Part part = order.get(partnr);
 			int length = parts.size() - partnr - 2;//Länge der freien Stimme; -2 : gleicher Grund
 			ArrayList<INote> notes = melGen.generateSubVoice(config, fugenSubjects, length);
@@ -183,7 +174,7 @@ public class FugenGenerator implements IMusicGenerator {
 	}
 	
 	/**
-	 * Fügt den Parts eine Engführung an. Der erste, dritte und fünfte Part, spielt den Dux, die restlichen den Comes.
+	 * Fügt den Parts eine Engführung an. Der erste, dritte und fünfte Part, spielen den Dux, die restlichen den Comes.
 	 * @param parts - Liste der Stimmen, welche die Fuge spielen sollen
 	 * @param fugenSubjects - {@link FugenSubjects} der Fuge
 	 * @param config - das {@link SongConfig} der Fuge
@@ -199,16 +190,8 @@ public class FugenGenerator implements IMusicGenerator {
 		ArrayList<Part> order = (ArrayList<Part>) parts.clone();//Objekte in order und parts sind die selben
 		Collections.shuffle(order);
 		//Intervalle der Stimmen zur Tonhöhe im FugenInfo
-		ArrayList<Integer> intervals = new ArrayList<Integer>();
-		for( int partnr = 0; partnr < order.size(); partnr++ ){
-			int pitch = parts.indexOf(order.get(partnr));
-			int interval = 7 * pitch/2;//bei 1/2; 3/2; ... wird abgerundet auf 0; 1, ...
-			if(partnr % 2 == 0){//Tonikeeinsatz; Dux
-				intervals.add(interval);
-			}else{//Dominanteinsatz; Comes
-				intervals.add(interval - 3);
-			}
-		}
+		ArrayList<Integer> intervals = intervals(parts, order);
+		
 		for(int partnr = 0; partnr < parts.size(); partnr++){
 			Part part = order.get(partnr);
 			ArrayList<INote> notes = new ArrayList<INote>();
@@ -244,6 +227,27 @@ public class FugenGenerator implements IMusicGenerator {
 			part.addAll(MelodyHelper.noteListToPart(config, notes, part.getInstrument()));
 		}
 
+	}
+	
+	private ArrayList<Integer> intervals(ArrayList<Part> parts, ArrayList<Part> order){
+		ArrayList<Integer> intervals = new ArrayList<Integer>();
+		for( int partnr = 0; partnr < order.size(); partnr++ ){
+			Part part1 = order.get(partnr);
+			int pitch = 0;
+			for(int index = 0; index < parts.size(); index++){
+				Part part2 = parts.get(index);
+				if(part1 == part2){
+					pitch = index;
+				}
+			}
+			int interval = 7 * ((int)(pitch + 1)/2);//bei 1/2; 3/2; ... wird abgerundet auf 0; 1, ...
+			if(partnr % 2 == 0){//Tonikaeinsatz; Dux
+				intervals.add(interval);
+			}else{//Dominanteinsatz; Comes
+				intervals.add(interval - 3);
+			}
+		}
+		return intervals;
 	}
 	
 	@Override
