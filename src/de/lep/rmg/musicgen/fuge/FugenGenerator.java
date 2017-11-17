@@ -8,9 +8,11 @@ import de.lep.rmg.model.Measure;
 import de.lep.rmg.model.Part;
 import de.lep.rmg.model.Song;
 import de.lep.rmg.model.SongConfig;
+import de.lep.rmg.model.helper.RandomHelper;
 import de.lep.rmg.model.instruments.Instrument;
 import de.lep.rmg.model.notes.INote;
 import de.lep.rmg.model.notes.Rest;
+import de.lep.rmg.model.notes.SNote;
 import de.lep.rmg.musicgen.IMusicGenerator;
 import de.lep.rmg.musicgen.RhythmGenerator;
 import de.lep.rmg.musicgen.helper.MelodyHelper;
@@ -47,37 +49,37 @@ public class FugenGenerator implements IMusicGenerator {
 		Instrument instrument = config.getInstruments()[0];
 		
 		//lege die Stimmen der Fuge als verschiedene Parts an
-		ArrayList<Part> partList = new ArrayList<Part>();
+		ArrayList<Part> parts = new ArrayList<Part>();
 		for(int i = 0; i < fugenSubjects.getVoices(); i++){
 			try{
-				partList.add(new Part(config.getInstruments()[i]));
+				parts.add(new Part(config.getInstruments()[i]));
 			}catch (ArrayIndexOutOfBoundsException aE){
-				partList.add(new Part(instrument));
+				parts.add(new Part(instrument));
 			}
 		}
 		
 		//Exposition, erste Durchführung
-		addSection(partList, fugenSubjects, config);
+		addSection(parts, fugenSubjects, config);
 		if(config.getRepeats() > 1){
 			//Modulation
-			addModulation(partList, fugenSubjects, config);
+			addModulation(parts, fugenSubjects, config);
 			//zweite Durchführung
-			addSection(partList, fugenSubjects, config);
+			addSection(parts, fugenSubjects, config);
 		}
 		if(config.getRepeats() > 2){
 			//Modulation
-			addModulation(partList, fugenSubjects, config);
+			addModulation(parts, fugenSubjects, config);
 			//Engführung
-			addSection(partList, fugenSubjects, config);
+			addSection(parts, fugenSubjects, config);
 		}
 		//Modulation
-		addModulation(partList, fugenSubjects, config);
+		addModulation(parts, fugenSubjects, config);
 		//Engführung
-		addFinalSection(partList, fugenSubjects, config);
-		//TODO Schlusskadenz
+		addFinalSection(parts, fugenSubjects, config);
+		//Schlusskadenz
+		addFinalCadence(parts, config);
 		
-		
-		Song song = new Song(config);song.addAll(partList);
+		Song song = new Song(config);song.addAll(parts);
 		return song;
 	}
 	
@@ -199,17 +201,19 @@ public class FugenGenerator implements IMusicGenerator {
 				if(partnr != 0){
 					//erste freie Stimmen hinzufügen
 					notes = melGen.generateSubVoice(config, fugenSubjects, (partnr + 1) / 2);//überlagernder Themeneinsatz
-					notes = MelodyHelper.subtNoteList(notes, notes.size() * measureDuration - measureDuration / 2, false);
+					//TODO funktioniert so nicht, Fehler evtl. in MelodyHelper#subNoteList
+					notes = MelodyHelper.subNoteList(notes, notes.size() * measureDuration - measureDuration / 2, false);
 				}
 				//Thema hinzufügen
 				notes.addAll(fugenSubjects.getSubjectList());
 				if(partnr != parts.size() - 1){
 					//zweite freie Stimme hinzufügen
 					ArrayList<INote> subVoice = melGen.generateSubVoice(config, fugenSubjects, (parts.size() - partnr - 1) / 2);
-					subVoice = MelodyHelper.subtNoteList(subVoice, subVoice.size() * measureDuration 
+					subVoice = MelodyHelper.subNoteList(subVoice, subVoice.size() * measureDuration 
 							- measureDuration / 2, true);
 					notes.addAll(subVoice);
 				}
+				//TODO mit Pausen auffüllen
 			}else{
 				if(partnr != 0){
 					//erste freie Stimmen hinzufügen
@@ -221,6 +225,7 @@ public class FugenGenerator implements IMusicGenerator {
 					//zweite freie Stimme hinzufügen
 					notes.addAll(melGen.generateSubVoice(config, fugenSubjects, (parts.size() - partnr - 1) / 2));
 				}
+				//TODO mit Pausen auffüllen
 			}
 			//transponieren und Part hinzufügen
 			notes = MelodyHelper.transpone(notes, intervals.get(partnr), config.getKey());
@@ -229,7 +234,33 @@ public class FugenGenerator implements IMusicGenerator {
 
 	}
 	
-	private ArrayList<Integer> intervals(ArrayList<Part> parts, ArrayList<Part> order){
+	private void addFinalCadence(List<Part> parts, SongConfig config){
+		ArrayList<Integer> intervals = intervals(parts, parts);
+		boolean[] parallelFunction = new boolean[4];
+		for(int i = 0; i < parallelFunction.length; i++){
+			parallelFunction[i] = RandomHelper.getRandom().nextBoolean();
+		}
+		for(int partnr = 0; partnr < parts.size(); partnr++){
+			ArrayList<INote> notes = new ArrayList<INote>();
+			for(int notenr = 0; notenr < parallelFunction.length; notenr++){
+				int tone = config.getKey().getKeynote();
+				switch(notenr){
+				case 1: tone += 4;
+				case 2: tone += 5;
+				default: break;
+				}
+				if(parallelFunction[notenr]){
+					notes.add(new SNote(tone - 2, melGen.getStandardOctave(), SNote.QUARTER));
+				}else{
+					notes.add(new SNote(tone, melGen.getStandardOctave(), SNote.QUARTER));
+				}
+			}
+			notes = MelodyHelper.transpone(notes, intervals.get(partnr), config.getKey());
+			parts.get(partnr).addAll(MelodyHelper.noteListToPart(config, notes, parts.get(partnr).getInstrument()));
+		}
+	}
+	
+	private ArrayList<Integer> intervals(List<Part> parts, List<Part> order){
 		ArrayList<Integer> intervals = new ArrayList<Integer>();
 		for( int partnr = 0; partnr < order.size(); partnr++ ){
 			Part part1 = order.get(partnr);

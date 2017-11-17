@@ -95,9 +95,9 @@ public class MelodyHelper {
 	 * @param duration - die Summe der Notendauern, die das angespaltene Stück haben soll
 	 * @param beginFront - falls true werden die Noten vom Anfang der Liste aus gewählt, 
 	 * 	ansonsten wird rückwärts über die Liste iteriet
-	 * @return neue Liste, die
+	 * @return die Teilliste
 	 */
-	public static ArrayList<INote> subtNoteList(ArrayList<INote> notes, int duration, boolean beginFront) {
+	public static ArrayList<INote> subNoteList(ArrayList<INote> notes, int duration, boolean beginFront) {
 		ArrayList<INote> ret = new ArrayList<INote>();
 		INote nextNote;
 		if(beginFront)

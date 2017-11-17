@@ -31,10 +31,14 @@ public interface IFugenMelodyGenerator {
 	 * Setzt voraus, dass Thema und Gegenthema gleich lang sind.
 	 * 
 	 * @param config - ein SongConfig
-	 * @param subject - Hauptmotiv der Fuge
-	 * @param antiSubject - Nebenmotiv der Fuge
+	 * @param fugenSubjects - Haupt- und Gegenthema der Fuge
 	 * @param length - Dauer der freien Stimme in Vielfachen der Länge des Themas
 	 * @return freie Stimme als ArrayList
 	 */
 	public ArrayList<INote> generateSubVoice( SongConfig config, FugenSubjects fugenSubjects, int length );
+	/**
+	 * Gibt die verwendete Standardoktave zurück.
+	 * @return die Standardoktave
+	 */
+	public int getStandardOctave();
 }
