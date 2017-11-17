@@ -44,9 +44,9 @@ public class SNote implements INote, IRealNote {
 	
 	
 	public SNote( int tone, int octave, int duration ) {
-		this.tone = tone;
-		this.octave = octave;
-		this.duration = duration;
+		setTone( tone );
+		setOctave( octave );
+		setDuration( duration );
 	}
 	
 	/*#############################################################################
