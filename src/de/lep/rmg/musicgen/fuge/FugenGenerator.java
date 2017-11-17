@@ -141,13 +141,13 @@ public class FugenGenerator implements IMusicGenerator {
 		for( int partnr = 0; partnr < order.size(); partnr++ ) {
 			Part part = order.get(partnr);
 			ArrayList<INote> subject = fugenSubjects.getSubjectList();
-			MelodyHelper.transpone(subject, intervals.get(partnr), config.getKey());
-			part.addAll(MelodyHelper.noteListToPart(config, subject, part.getInstrument()));
+			ArrayList<INote> subTransposition = MelodyHelper.transpone(subject, intervals.get(partnr), config.getKey());
+			part.addAll(MelodyHelper.noteListToPart(config, subTransposition, part.getInstrument()));
 			//falls es nicht der letzte Part ist, wird auch das Gegenthema hinzugefügt
 			if(part != order.get(order.size() - 1)){
-				ArrayList<INote> anitSubject = fugenSubjects.getAntiSubjectList();
-				MelodyHelper.transpone(anitSubject, intervals.get(partnr), config.getKey());
-				part.addAll(MelodyHelper.noteListToPart(config, anitSubject, part.getInstrument()));
+				ArrayList<INote> antiSubject = fugenSubjects.getAntiSubjectList();
+				ArrayList<INote> antiTransposition = MelodyHelper.transpone(antiSubject, intervals.get(partnr), config.getKey());
+				part.addAll(MelodyHelper.noteListToPart(config, antiTransposition, part.getInstrument()));
 			}
 		}
 		// Rest mit freien Stimmen auffüllen
