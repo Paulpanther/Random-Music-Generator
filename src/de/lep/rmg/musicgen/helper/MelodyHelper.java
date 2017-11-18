@@ -90,7 +90,7 @@ public class MelodyHelper {
 	
 	/**
 	 * Spaltet von einer Liste von {@link INote}n eine kleinere Liste ab, deren Notenlängen die als Parameter
-	 * angegebene Gesamtlänge (duration) erreichen. Die Originalliste bleibt unverändert
+	 * angegebene Gesamtlänge (duration) erreichen. Die Originalliste bleibt unverändert.
 	 * @param notes - Liste der Noten, von der abgespalten werden soll
 	 * @param duration - die Summe der Notendauern, die das angespaltene Stück haben soll
 	 * @param beginFront - falls true werden die Noten vom Anfang der Liste aus gewählt, 
@@ -99,26 +99,19 @@ public class MelodyHelper {
 	 */
 	public static ArrayList<INote> subNoteList(ArrayList<INote> notes, int duration, boolean beginFront) {
 		ArrayList<INote> ret = new ArrayList<INote>();
-		INote nextNote;
-		if(beginFront)
-			nextNote = notes.get(0);
-		else
-			nextNote = notes.get(notes.size() - 1);
-		duration -= nextNote.getDuration();
-		int elemCount = 1;
+		INote note = null;
+		int elemCount = 0;
 		while( duration > 0 ) {
-			ret.add(nextNote);
 			if(beginFront)
-				nextNote = notes.get(elemCount);
+				note = notes.get(elemCount);
 			else
-				nextNote = notes.get(notes.size() - elemCount - 1);
-			duration -= nextNote.getDuration();
+				note = notes.get(notes.size() - elemCount - 1);
+			duration -= note.getDuration();
+			ret.add(note.clone());
 			elemCount++;
 		}
 		if(duration < 0) {
-			nextNote = nextNote.clone();
-			nextNote.setDuration(Math.abs(duration));
-			ret.add(nextNote);
+			note.setDuration(Math.abs(duration));
 		}
 		return ret;
 	}

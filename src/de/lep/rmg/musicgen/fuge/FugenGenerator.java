@@ -22,9 +22,9 @@ import de.lep.rmg.view.panels.FugenControllPanel;
 
 public class FugenGenerator implements IMusicGenerator {
 	
-	IFugenMelodyGenerator melGen;
-	MidiPlayer midiPlayer;
-	FugenSubjects fugenSubjects;
+	private IFugenMelodyGenerator melGen;
+	private MidiPlayer midiPlayer;
+	/*private*/ FugenSubjects fugenSubjects;//private disabled for testing
 	
 	public FugenGenerator( MidiPlayer midiPlayer, IFugenMelodyGenerator FMG ) {
 		melGen = FMG;
@@ -59,23 +59,23 @@ public class FugenGenerator implements IMusicGenerator {
 		}
 		
 		//Exposition, erste Durchführung
-		addSection(parts, fugenSubjects, config);
+		addSection(parts, config);
 		if(config.getRepeats() > 1){
 			//Modulation
-			addModulation(parts, fugenSubjects, config);
+			addModulation(parts, config);
 			//zweite Durchführung
-			addSection(parts, fugenSubjects, config);
+			addSection(parts, config);
 		}
 		if(config.getRepeats() > 2){
 			//Modulation
-			addModulation(parts, fugenSubjects, config);
+			addModulation(parts, config);
 			//Engführung
-			addSection(parts, fugenSubjects, config);
+			addSection(parts, config);
 		}
 		//Modulation
-		addModulation(parts, fugenSubjects, config);
+		addModulation(parts, config);
 		//Engführung
-		addFinalSection(parts, fugenSubjects, config);
+		addFinalSection(parts, config);
 		//Schlusskadenz
 		addFinalCadence(parts, config);
 		
@@ -83,7 +83,12 @@ public class FugenGenerator implements IMusicGenerator {
 		return song;
 	}
 	
-	private FugenSubjects generateSubjects(SongConfig config){
+	/**
+	 * 
+	 * @param config
+	 * @return
+	 */
+	/*private*/ FugenSubjects generateSubjects(SongConfig config){ //private disabled for testing
 		Instrument instrument = config.getInstruments()[0];
 		int voices = config.getInstruments().length;//Anzahl der Stimmen, die die Fuge spielen
 		if( voices < 2)//mindestens 2, maximal 6 Stimmen, üblich sind 3 oder 4
@@ -113,7 +118,7 @@ public class FugenGenerator implements IMusicGenerator {
 	 * @param fugenSubjects - {@link FugenSubjects} der Fuge
 	 * @param config - das {@link SongConfig} der Fuge
 	 */
-	private void addSection(ArrayList<Part> parts, FugenSubjects fugenSubjects, SongConfig config){
+	/*private*/ void addSection(ArrayList<Part> parts, SongConfig config){ //private disabled for testing
 		//speichert in welcher Reihenfolge die Stimmen zu spielen beginnen
 		@SuppressWarnings("unchecked")//clone benötigt, da ursprüngliche Reihenfolge in parts erhalten bleiben muss
 		ArrayList<Part> order = (ArrayList<Part>) parts.clone();//Objekte in order und parts sind die selben
@@ -123,21 +128,9 @@ public class FugenGenerator implements IMusicGenerator {
 		
 		//falls dies der Anfang des Stücks ist, werden die untergeordneten Stimmen mit Pausen aufgefüllt
 		if(parts.get(0).isEmpty()){
-			Measure restMeasure = new Measure(config);
-			restMeasure.add(new Rest(config.getMeasureDivision() * config.getBeats()));
-			for(int partnr = 1; partnr < parts.size(); partnr++){//erster Part beginnt direkt mit Thema, daher partnr = 1
-				Part part = order.get(partnr);
-				for(int j = 0; j < (fugenSubjects.getSubjectPart().size()*partnr); j++){
-					part.add(restMeasure);
-				}
-			}
+			fillWithRests(order, fugenSubjects.getSubjectPart().size(), config);
 		}else{//ansonsten werden freie Stimmen gespielt
-			for(int partnr = 1; partnr < parts.size(); partnr++){//erster Part beginnt direkt mit Thema, daher partnr = 1
-				Part part = order.get(partnr);
-				ArrayList<INote> notes = melGen.generateSubVoice(config, fugenSubjects, partnr);
-				MelodyHelper.transpone(notes, intervals.get(partnr), config.getKey());
-				part.addAll(MelodyHelper.noteListToPart(config, notes, part.getInstrument()));
-			}
+			fillSubVoices(order, intervals, config);
 		}
 		//Thema und Gegenthema hinzufügen
 		for( int partnr = 0; partnr < order.size(); partnr++ ) {
@@ -153,14 +146,7 @@ public class FugenGenerator implements IMusicGenerator {
 			}
 		}
 		// Rest mit freien Stimmen auffüllen
-		for(int partnr = 0; partnr < order.size() - 2; partnr++) {//letzte zwei Parts sind bereits fertig, daher partnr < parts.size() - 2 2
-			Part part = order.get(partnr);
-			int length = parts.size() - partnr - 2;//Länge der freien Stimme; -2 : gleicher Grund
-			ArrayList<INote> notes = melGen.generateSubVoice(config, fugenSubjects, length);
-			MelodyHelper.transpone(notes, intervals.get(partnr), config.getKey());
-			part.addAll(MelodyHelper.noteListToPart(config, notes, part.getInstrument()));
-		}
-		
+		fillSubVoicesReverseOrder(order, intervals, config);
 	}
 	
 	/**
@@ -169,7 +155,7 @@ public class FugenGenerator implements IMusicGenerator {
 	 * @param fugenSubjects - {@link FugenSubjects} der Fuge
 	 * @param config - das {@link SongConfig} der Fuge
 	 */
-	private void addModulation(List<Part> parts, FugenSubjects fugenSubjects, SongConfig config){
+	/*private*/ void addModulation(List<Part> parts, SongConfig config){ //private disabled for testing
 		
 		//TODO
 		
@@ -181,12 +167,8 @@ public class FugenGenerator implements IMusicGenerator {
 	 * @param fugenSubjects - {@link FugenSubjects} der Fuge
 	 * @param config - das {@link SongConfig} der Fuge
 	 */
-	private void addFinalSection(ArrayList<Part> parts, FugenSubjects fugenSubjects, SongConfig config){
+	/*private*/ void addFinalSection(ArrayList<Part> parts, SongConfig config){//private disabled for testing
 		int measureDuration = config.getBeats() * config.getMeasureDivision();
-		boolean halfMeasure = false;
-		if(fugenSubjects.getSubjectPart().size() % 2 == 1){//falls das Thema eine ungerade Taktanzahl hat
-			halfMeasure = true;
-		}
 		//speichert in welcher Reihenfolge die Stimmen zu spielen beginnen
 		@SuppressWarnings("unchecked")//clone benötigt, da ursprüngliche Reihenfolge in parts erhalten bleiben muss
 		ArrayList<Part> order = (ArrayList<Part>) parts.clone();//Objekte in order und parts sind die selben
@@ -197,35 +179,15 @@ public class FugenGenerator implements IMusicGenerator {
 		for(int partnr = 0; partnr < parts.size(); partnr++){
 			Part part = order.get(partnr);
 			ArrayList<INote> notes = new ArrayList<INote>();
-			if(halfMeasure && partnr % 2 == 1){
-				if(partnr != 0){
-					//erste freie Stimmen hinzufügen
-					notes = melGen.generateSubVoice(config, fugenSubjects, (partnr + 1) / 2);//überlagernder Themeneinsatz
-					//TODO funktioniert so nicht, Fehler evtl. in MelodyHelper#subNoteList
-					notes = MelodyHelper.subNoteList(notes, notes.size() * measureDuration - measureDuration / 2, false);
-				}
-				//Thema hinzufügen
-				notes.addAll(fugenSubjects.getSubjectList());
-				if(partnr != parts.size() - 1){
-					//zweite freie Stimme hinzufügen
-					ArrayList<INote> subVoice = melGen.generateSubVoice(config, fugenSubjects, (parts.size() - partnr - 1) / 2);
-					subVoice = MelodyHelper.subNoteList(subVoice, subVoice.size() * measureDuration 
-							- measureDuration / 2, true);
-					notes.addAll(subVoice);
-				}
-				//TODO mit Pausen auffüllen
-			}else{
-				if(partnr != 0){
-					//erste freie Stimmen hinzufügen
-					notes = melGen.generateSubVoice(config, fugenSubjects, (partnr + 1) / 2);//überlagernder Themeneinsatz
-				}
-				//Thema hinzufügen
-				notes.addAll(fugenSubjects.getSubjectList());
-				if(partnr != parts.size() - 1){
-					//zweite freie Stimme hinzufügen
-					notes.addAll(melGen.generateSubVoice(config, fugenSubjects, (parts.size() - partnr - 1) / 2));
-				}
-				//TODO mit Pausen auffüllen
+			//erste freie Stimmen hinzufügen
+			notes = melGen.generateSubVoice(config, fugenSubjects, partnr);//überlagernder Themeneinsatz
+			notes = MelodyHelper.subNoteList(notes, config.getChordNr() * measureDuration / 2, false);
+			//Thema hinzufügen
+			notes.addAll(fugenSubjects.getSubjectList());
+			if(parts.size() - 1 > partnr){
+				//zweite freie Stimme hinzufügen
+				ArrayList<INote> subVoice = melGen.generateSubVoice(config, fugenSubjects, (parts.size() - 1 - partnr));
+				subVoice = MelodyHelper.subNoteList(subVoice, config.getChordNr() * measureDuration / 2, true);
 			}
 			//transponieren und Part hinzufügen
 			notes = MelodyHelper.transpone(notes, intervals.get(partnr), config.getKey());
@@ -260,25 +222,117 @@ public class FugenGenerator implements IMusicGenerator {
 		}
 	}
 	
-	private ArrayList<Integer> intervals(List<Part> parts, List<Part> order){
+	/**
+	 * Berechnet für jeden Part, um welches Interval er transponiert werden muss.
+	 * Jeder Part der in 'order' einen geraden Index hat spielt einen Tonikaeinsatz
+	 * und erhält ein durch 7 teilbares Interval.
+	 * Jeder Part, der in 'order' einen ungeraden Index hat spielt einen Dominanteinsatz
+	 * und erhält ein durch 7 teilbares Interval + 4 (oder -3).
+	 * Dabei kommt kein vergebenes Interval doppelt vor und alle Intervalle einer Einsatzgruppe
+	 * sind nach der Position des Parts in 'parts' sortiert.
+	 * Die Methode setzt voraus, dass 'parts' und 'order' die selben Element enthalten,
+	 * wenn auch nicht unbedingt in der selben Reihenfolge.
+	 * @param parts - Parts soritert nach Tonhöhe von tief nach hoch
+	 * @param order - gleiche Parts sortiert nach Reihenfolge des Einsatzes
+	 * @return Intervalle in Reihenfolge des Einsatzes,
+	 * um die die Parts transponiert werden müssen um die passende Tonhöhe zu erhalten
+	 */
+	/*private*/ ArrayList<Integer> intervals(List<Part> parts, List<Part> order){ //private disabled for testing
 		ArrayList<Integer> intervals = new ArrayList<Integer>();
+		ArrayList<Integer> duxInt = new ArrayList<Integer>();
+		ArrayList<Integer> comesInt = new ArrayList<Integer>();
+		ArrayList<Part> dux = new ArrayList<Part>();
+		ArrayList<Part> comes = new ArrayList<Part>();
 		for( int partnr = 0; partnr < order.size(); partnr++ ){
-			Part part1 = order.get(partnr);
-			int pitch = 0;
-			for(int index = 0; index < parts.size(); index++){
-				Part part2 = parts.get(index);
-				if(part1 == part2){
-					pitch = index;
+			if(partnr % 2 == 0){//Tonikaeinsatz
+				dux.add(order.get(partnr));
+			}else{//Dominanteinsatz
+				comes.add(order.get(partnr));
+			}
+		}
+		int dim = 0;
+		for( int partnr = 0; partnr < parts.size(); partnr++){
+			Part part = parts.get(partnr);
+			for( int pitch = 0; pitch < dux.size(); pitch++){
+				if(part == dux.get(pitch)){
+					duxInt.add(pitch*7);
 				}
 			}
-			int interval = 7 * ((int)(pitch + 1)/2);//bei 1/2; 3/2; ... wird abgerundet auf 0; 1, ...
-			if(partnr % 2 == 0){//Tonikaeinsatz; Dux
-				intervals.add(interval);
-			}else{//Dominanteinsatz; Comes
-				intervals.add(interval - 3);
+			for( int pitch = 0; pitch < comes.size(); pitch++){
+				if(part == comes.get(pitch)){
+					if(partnr == 0 && dux.size() == comes.size()){
+						dim = 7;
+					}
+					comesInt.add(pitch*7 + 4 - dim);
+				}
+			}
+		}
+		for(int index = 0; index < dux.size(); index++){
+			intervals.add(duxInt.get(index));
+			if(index < comesInt.size()){
+				intervals.add(comesInt.get(index));
 			}
 		}
 		return intervals;
+	}
+	
+	/**
+	 * Die {@link Part}s werden mit Takten, die nur Pausen enthalten, in der
+	 * Anzahl entsprechend ihres Index' in der Liste * {@code measures} erweitert.
+	 * Das heißt, dass der erste Part unverändert bleibt.
+	 * Die Methode kann nur ganze Takte anfügen undgeht davon aus,
+	 * dass der letzte Takt abgeschlossen
+	 * ist. Sie wird immer mit einem neuen Takt beginnen.
+	 * @param partorder - Die mit Pausen zu füllenden {@link Part}s in Reihenfolge
+	 * @param measures - Anzahl der Pausentakte die angefügt werden sollen
+	 * @param config - ein {@link SongConfig}
+	 */
+	private void fillWithRests(List<Part> partorder, int measures, SongConfig config){
+		Measure restMeasure = new Measure(config);
+		restMeasure.add(new Rest(config.getMeasureDivision() * config.getBeats()));
+		for(int partnr = 1; partnr < partorder.size(); partnr++){//erster Part beginnt direkt mit Thema, daher partnr = 1
+			Part part = partorder.get(partnr);
+			for(int j = 0; j < measures*partnr; j++){
+				part.add(restMeasure);
+			}
+		}
+	}
+	
+	/**
+	 * Die Parts werden mit untergeordneten Stimmen erweitert.
+	 * Der erste Part bleibt dabei unverändert. Der zweite erhält
+	 * so viele neue Takte, wie das Hauptthema hat. Der Dritte zweimal
+	 * soviele, der Vierte dreimal soviele und so weiter.
+	 * @param partorder - die mit untergeordenten Stimmen zu füllenden {@link Part}s in Reihenfolge
+	 * @param transponationIntervals - Die Intervalle, um die die verschiedenen Stimmen transponiert werden sollen
+	 * @param config - ein {@link SongConfig}
+	 */
+	private void fillSubVoices(List<Part> partorder, List<Integer> transponationIntervals, SongConfig config){
+		for(int partnr = 1; partnr < partorder.size(); partnr++){//erster Part beginnt direkt mit Thema, daher partnr = 1
+			Part part = partorder.get(partnr);
+			ArrayList<INote> notes = melGen.generateSubVoice(config, fugenSubjects, partnr);
+			MelodyHelper.transpone(notes, transponationIntervals.get(partnr), config.getKey());
+			part.addAll(MelodyHelper.noteListToPart(config, notes, part.getInstrument()));
+		}
+	}
+	
+	/**
+	 * Die Parts werden mit untergeordneten Stimmen erweitert.
+	 * Die letzten beiden Part bleibt dabei unverändert. Der vorvorletzte Part erhält
+	 * so viele neue Takte, wie das Hauptthema hat. Der davor zweimal
+	 * soviele, der davor dreimal soviele und so weiter.
+	 * @param partorder - die mit untergeordenten Stimmen zu füllenden {@link Part}s in Reihenfolge
+	 * @param transponationIntervals - Die Intervalle, um die die verschiedenen Stimmen transponiert werden sollen
+	 * @param config - ein {@link SongConfig}
+	 */
+	private void fillSubVoicesReverseOrder(List<Part> partorder, List<Integer> transponationIntervals, SongConfig config){
+		for(int partnr = 0; partnr < partorder.size() - 2; partnr++) {//letzte zwei Parts sind bereits fertig, daher partnr < parts.size() - 2 2
+			Part part = partorder.get(partnr);
+			int length = partorder.size() - partnr - 2;//Länge der freien Stimme; -2 : gleicher Grund
+			ArrayList<INote> notes = melGen.generateSubVoice(config, fugenSubjects, length);
+			MelodyHelper.transpone(notes, transponationIntervals.get(partnr), config.getKey());
+			part.addAll(MelodyHelper.noteListToPart(config, notes, part.getInstrument()));
+		}
 	}
 	
 	@Override
