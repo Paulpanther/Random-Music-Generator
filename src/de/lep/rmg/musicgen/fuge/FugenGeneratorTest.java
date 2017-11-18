@@ -95,6 +95,7 @@ public class FugenGeneratorTest {
 	
 	private void sameSize(String message){
 		for(int partnr = 0; partnr < parts.length - 1; partnr++){
+			System.out.println(parts[partnr].size() + " " + parts[partnr + 1].size());
 			if(parts[partnr].size() != parts[partnr + 1].size()){
 				fail(message);
 			}

@@ -72,7 +72,7 @@ public class RhythmGenerator {
 	public static ArrayList<INote> generateMotif( SongConfig config, int length ) {
 		ArrayList<INote> motif = new ArrayList<INote>();
 		int measure = config.getBeats() * config.getMeasureDivision();
-		for(int i = 0; i < config.getChordNr(); i++){
+		for(int i = 0; i < config.getChordNr() * length; i++){
 			for(int dur : generateMiniRhythm( config, measure, RandomHelper.getRandom() ) ){
 				motif.add( makeNote( config, dur) );
 			}

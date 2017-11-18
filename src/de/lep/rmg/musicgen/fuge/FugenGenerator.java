@@ -168,7 +168,7 @@ public class FugenGenerator implements IMusicGenerator {
 	 * @param config - das {@link SongConfig} der Fuge
 	 */
 	/*private*/ void addFinalSection(ArrayList<Part> parts, SongConfig config){//private disabled for testing
-		int measureDuration = config.getBeats() * config.getMeasureDivision();
+		int subjectDuration = config.getChordNr() * config.getBeats() * config.getMeasureDivision();
 		//speichert in welcher Reihenfolge die Stimmen zu spielen beginnen
 		@SuppressWarnings("unchecked")//clone benötigt, da ursprüngliche Reihenfolge in parts erhalten bleiben muss
 		ArrayList<Part> order = (ArrayList<Part>) parts.clone();//Objekte in order und parts sind die selben
@@ -176,19 +176,18 @@ public class FugenGenerator implements IMusicGenerator {
 		//Intervalle der Stimmen zur Tonhöhe im FugenInfo
 		ArrayList<Integer> intervals = intervals(parts, order);
 		
-		for(int partnr = 0; partnr < parts.size(); partnr++){
+		for(int partnr = 0; partnr < order.size(); partnr++){
 			Part part = order.get(partnr);
 			ArrayList<INote> notes = new ArrayList<INote>();
 			//erste freie Stimmen hinzufügen
 			notes = melGen.generateSubVoice(config, fugenSubjects, partnr);//überlagernder Themeneinsatz
-			notes = MelodyHelper.subNoteList(notes, config.getChordNr() * measureDuration / 2, false);
+			notes = MelodyHelper.subNoteList(notes, partnr * subjectDuration / 2, false);
 			//Thema hinzufügen
 			notes.addAll(fugenSubjects.getSubjectList());
-			if(parts.size() - 1 > partnr){
-				//zweite freie Stimme hinzufügen
-				ArrayList<INote> subVoice = melGen.generateSubVoice(config, fugenSubjects, (parts.size() - 1 - partnr));
-				subVoice = MelodyHelper.subNoteList(subVoice, config.getChordNr() * measureDuration / 2, true);
-			}
+			//zweite freie Stimme hinzufügen
+			ArrayList<INote> subVoice = melGen.generateSubVoice(config, fugenSubjects, (order.size() - 1 - partnr));
+			subVoice = MelodyHelper.subNoteList(subVoice, (order.size() - 1 - partnr) * subjectDuration / 2, true);
+			notes.addAll(subVoice);
 			//transponieren und Part hinzufügen
 			notes = MelodyHelper.transpone(notes, intervals.get(partnr), config.getKey());
 			part.addAll(MelodyHelper.noteListToPart(config, notes, part.getInstrument()));
