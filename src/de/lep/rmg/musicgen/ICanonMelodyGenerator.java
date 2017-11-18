@@ -23,5 +23,4 @@ public interface ICanonMelodyGenerator {
 			SongConfig config
 			);
 	
-	String getGeneratorName();
 }

@@ -82,4 +82,61 @@ public class Chord extends ArrayList<SNote> implements INote {
 	}
 	
 	
+	public void addStep(int steps) {
+		for(SNote sno : this){
+			sno.addStep(steps);
+		}
+	}
+	
+	public int[] toInts() {
+		int[] ints = new int[this.size()];
+		for ( int i = 0; i < this.size(); i++ ) {
+			ints[i] = get(i).getTone() + get(i).getOctave() * 12;
+		}
+		return ints;
+	}
+	
+	
+	
+	/**
+	 * @return Tonhöhe der tiefsten Note
+	 */
+	public int getTone() {
+		SNote lowest = null;
+		for(SNote sno : this){
+			if(lowest == null)
+				lowest = sno;
+			else
+				if(sno.getTone() + sno.getOctave() * 12 < lowest.getTone() + lowest.getOctave() * 12)
+					lowest = sno;
+		}
+		return lowest.getTone();
+	}
+	
+	public Chord clone(){
+		return new Chord(this);
+	}
+	
+	/**
+	 * @return Oktave der tiefsten Note
+	 */
+	public int getOctave() {
+		SNote lowest = null;
+		for(SNote sno : this){
+			if(lowest == null)
+				lowest = sno;
+			else
+				if(sno.getTone() + sno.getOctave() * 12 < lowest.getTone() + lowest.getOctave() * 12)
+					lowest = sno;
+		}
+		return lowest.getOctave();
+	}
+
+	@Override
+	public void setDuration(int duration) {
+		for( SNote sno : this) {
+			sno.setDuration(duration);
+		}
+	}
+	
 }

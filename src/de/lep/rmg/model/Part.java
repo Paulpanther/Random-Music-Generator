@@ -40,5 +40,4 @@ public class Part extends ArrayList<Measure> {
 		return value;
 	}
 	
-	
 }

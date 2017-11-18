@@ -57,11 +57,6 @@ public class PercentPair {
 	 * @return Einen zufällig gezogenen Wert
 	 */
 	public static int getRandomValue( PercentPair[] pairs, Random r ) {
-		//Checkt, ob Parameter korrekt sind
-		if(pairs == null || pairs.length == 0){
-			throw new NullPointerException( "null-argument given to PercentPair.getRandomValue" );
-		}
-		
 		//Setzt Summe zu 1
 		float ges = 0;
 		for( PercentPair entity : pairs )
@@ -96,6 +91,23 @@ public class PercentPair {
 		return value;
 	}
 	
+	public static int getRandomValue( ArrayList<PercentPair> pairs, Random r ) {
+		float randomNr = r.nextFloat();
+		float sum = 0;
+		for(PercentPair pair : pairs){
+			sum += pair.getPercent();
+		}
+		randomNr *= sum;
+		float counter = 0;
+		for(PercentPair pair : pairs){
+			counter += pair.getPercent();
+			if(counter >= randomNr){
+				return pair.getValue();
+			}
+		}
+		throw new IllegalArgumentException("This is not supposed to happen");
+	}
+	
 	/**
 	 * Entfernt Werte, welche größer gleich dem gegebenen maximalen Wert sind.
 	 * 
@@ -111,6 +123,28 @@ public class PercentPair {
 		}
 		return newPairs.toArray( new PercentPair[ newPairs.size() ] );
 	}
+	
+	public static ArrayList<PercentPair> removeValuesGreaterThan( int max, ArrayList<PercentPair> pairs ) {
+		ArrayList<PercentPair> newPairs = new ArrayList<PercentPair>();
+		for( PercentPair pair : pairs ) {
+			if( pair.getValue() <= max )
+				newPairs.add( pair );
+		}
+		return newPairs;
+	}
+//	/**
+//	 * Prüft, ob ein bestimmter Wert in einem Array von PercentPairs vorkommt
+//	 * @param pairs - zu durchsuchender Array
+//	 * @param value - Wert auf den geprüft wird
+//	 * @return true, falls value in pairs vorhanden ist
+//	 */
+//	public static boolean valueInArray( PercentPair[] pairs, int value){
+//		for( PercentPair pair : pairs) {
+//			if( pair.getValue() == value)
+//				return true;
+//		}
+//		return false;
+//	}
 	
 	/**
 	 * Klont ein PercentPair-Array

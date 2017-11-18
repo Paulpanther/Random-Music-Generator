@@ -10,7 +10,7 @@ import de.lep.rmg.model.notes.helper.ChordHelper;
 /**
  * Enthält Methoden zum generieren von Akkorden
  * 
- * @see MusicGenerator Controller für diese Klasse
+ * @see CanonGenerator Controller für diese Klasse
  * @see ChordHelper Hilfsklasse für Akkordumwandlungen	
  */
 public class ChordGenerator {

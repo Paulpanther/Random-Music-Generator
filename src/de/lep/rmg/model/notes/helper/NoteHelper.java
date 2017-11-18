@@ -1,7 +1,10 @@
 package de.lep.rmg.model.notes.helper;
 
+import java.util.Arrays;
+
 import de.lep.rmg.model.notes.Chord;
 import de.lep.rmg.model.notes.INote;
+import de.lep.rmg.model.notes.IRealNote;
 import de.lep.rmg.model.notes.Rest;
 import de.lep.rmg.model.notes.SChord;
 import de.lep.rmg.model.notes.SNote;
@@ -199,8 +202,9 @@ public class NoteHelper {
 					interval = 2;
 				else if(steps == 5)
 					interval = 3;
-				else if(steps == 6){
+				else if(steps == 6){//ohne Tonart nicht eindeutig
 					interval = 4;
+					System.out.println("Halbtonschrittdifferenz 6 in NoteHelper#getInterval(int, int)");
 				}else if(steps == 7)
 					interval = 4;
 				else if(steps < 10)
@@ -213,8 +217,9 @@ public class NoteHelper {
 					interval = -2;
 				else if(steps == -5)
 					interval = -3;
-				else if(steps == -6){
+				else if(steps == -6){//ohne Tonart nicht eindeutig
 					interval = -4;
+					System.out.println("Halbtonschrittdifferenz 6 in NoteHelper#getInterval(int, int)");
 				}else if(steps == -7)
 					interval = -4;
 				else if(steps > -10)
@@ -228,27 +233,83 @@ public class NoteHelper {
 	}
 	
 	/**
-	 * Gibt zu einem Ton den Ton zurück, der zu ihm das angeforderte Interval hat
+	 * Gibt zu einem Ton den Ton zurück, der zu ihm das angeforderte Interval hat.
+	 * Wirft eine Excetion falls der Ton nicht in der Tonleiter der Tonart ist.
 	 * @param tone Ton, dem das Interval hinzugefügt wird
 	 * @param interval Das Interval, das aufaddiert wird. Darf auch negativ sein.<br>
 	 * 	0 = Prime; 1 = Sekunde; ...; 7 = Oktave
 	 * @param key Tonart, die zugrundegelegt wird
 	 * @return Tonhöhe des Intervals in Halbtonschritten
+	 * 
+	 * @see NoteHelperTest#testAddInterval()
 	 */
 	public static int addInterval(int tone, int interval, SChord key){
-		int retTone = tone;
-		int[] scale = ChordHelper.getScale(key);
+		int[] scale = ChordHelper.getScale(key);//Tonleiter der Tonart
 		int octavechange = 0;//Änderung der Oktave
-		while(interval < 0){//Interval muss für Berechnung zwischen 0 und 6 liegen
+		int searchTone = tone;
+		while( searchTone < 0 ) {
+			searchTone += 12;
+			octavechange--;
+		}
+		while( searchTone >= 12 ) {
+			searchTone -= 12;
+			octavechange++;
+		}
+		int index = Arrays.binarySearch(scale, searchTone);
+		if( index == -1) {
+			index = Arrays.binarySearch(scale, searchTone + 12);
+			octavechange--;
+		}
+		if( index == -1) {//falls der Ton nicht in der Tonleiter ist
+			throw new IllegalArgumentException("Der Ton " + NoteHelper.getToneString( new SNote( tone, 0, 0 ) ) + NoteHelper.getAlter( new SNote( tone, 0, 0 ) ) + " liegt nicht auf der Tonleiter von " + key);
+		}
+		while(index + interval < 0){//Interval muss für Berechnung zwischen 0 und 6 liegen
 			interval += 7;
 			octavechange--;
 		}
-		while(interval > 6){
+		while(index + interval >= 7){
 			interval -= 7;
 			octavechange++;
 		}
-		retTone += scale[interval] - scale[0];//zählt das Interval zum Ursprungston hinzu
+		int retTone = scale[interval + index];//zählt das Interval zum Ursprungston hinzu
 		retTone += octavechange*12;//gleich die Oktave an
 		return retTone;
+	}
+	
+	/**
+	 * Verändert die Tonhöhe der übergebenen Note, um das angeforderte Interval.
+	 * Falls die Note nicht auf der Tonleiter der Tonart liegt wird eine Exception geworfen.
+	 * @param note - Note deren Tonhöhe verändert werden soll
+	 * @param interval - Interval, um das verändert wird. 0 == Prime, 1 == Sekunde, ...
+	 * @param key - Tonart, die zugrundegelegt wird. Bestimmt den Intervaltyp: klein, groß, rein, ...
+	 * 
+	 * @see NoteHelperTest#testAddIntervalRealNote()
+	 */
+	public static void addInterval(IRealNote note, int interval, SChord key){
+		int[] scale = ChordHelper.getScale(key);//Tonleiter
+		int octavechange = 0;//Änderung der Oktave
+		int index = Arrays.binarySearch(scale, note.getTone());
+		if( index == -1 ) {
+			index = Arrays.binarySearch(scale, note.getTone() + 12);
+			octavechange--;
+		}
+		if(index == -1) {//falls der Ton nicht in der Tonlieter ist
+			throw new IllegalArgumentException("Der Ton " + note + " liegt nicht auf der Tonleiter von " + key);
+		}
+		while(interval + index < 0){//Interval muss für Berechnung zwischen 0 und 6 liegen
+			interval += 7;
+			octavechange--;//Oktave muss nachher entsprechend angeglichen werden
+		}
+		while(interval + index > 6){
+			interval -= 7;
+			octavechange++;
+		}
+		int newTone = scale[interval + index];
+		if(newTone >= 12){
+			newTone -= 12;
+			octavechange++;
+		}
+		note.setTone(newTone);//zählt das Interval zum Ursprungston hinzu und gleicht Oktave an
+		note.setOctave(note.getOctave() + octavechange);
 	}
 }

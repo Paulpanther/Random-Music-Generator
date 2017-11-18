@@ -9,7 +9,7 @@ import de.lep.rmg.model.instruments.Instrument;
  * Folgende Struktur liegt vor:<br>
  * {@link Song} -> {@link Part} -> {@link Measure} -> {@link INote} ({@link SNote}/{@link Chord}/{@link Rest})
  * 
- * @see MusicGenerator Controller dieser Klasse
+ * @see CanonGenerator Controller dieser Klasse
  */
 public class Song extends ArrayList<Part> {
 	private static final long serialVersionUID = 1L;

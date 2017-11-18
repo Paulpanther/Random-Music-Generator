@@ -2,6 +2,7 @@ package de.lep.rmg.musicgen;
 
 import de.lep.rmg.model.Song;
 import de.lep.rmg.model.SongConfig;
+import de.lep.rmg.view.panels.ControllPanel;
 
 /**
  * Interface für Musikgeneratoren.<br>
@@ -19,7 +20,7 @@ public interface IMusicGenerator {
 	public Song generateSong( SongConfig config );
 	
 	/**
-	 * Gibt den Typ des Songs zurück.<br>
+	 * Gibt den Typ des {@link Song}s zurück.<br>
 	 * Z.B: Kanon
 	 * @return Der Typ des Songs
 	 */
@@ -27,7 +28,14 @@ public interface IMusicGenerator {
 	
 	/**
 	 * Gibt den Namen des Generators zurück. Wird im GUI verwendet.
-	 * @return Name des MusicGenerators
+	 * @return Name des {@link IMusicGenerator}s
 	 */
 	public String getGeneratorName();
+	
+	/**
+	 * Gibt ein {@link ControllPanel} zurück, mit dem der Nutzer das SongConfig einstellen
+	 * und die Generierung des {@link Song}s starten kann
+	 * @return ein zu Generator gehörendes {@link ControllPanel}
+	 */
+	public ControllPanel getGeneratorPanel();
 }

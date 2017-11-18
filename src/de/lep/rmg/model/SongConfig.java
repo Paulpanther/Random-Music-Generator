@@ -5,6 +5,7 @@ import java.util.Random;
 
 import de.lep.rmg.model.Measure.Clef;
 import de.lep.rmg.model.helper.PercentPair;
+import de.lep.rmg.model.helper.RandomHelper;
 import de.lep.rmg.model.instruments.AcusticGuitar;
 import de.lep.rmg.model.instruments.Flute;
 import de.lep.rmg.model.instruments.Instrument;
@@ -23,7 +24,7 @@ import de.lep.rmg.out.xml.XMLGenerator;
  * Zu jeden Feld steht in '@category', in welchen Algorithmus sie verwendet wird (XML- oder MIDI-Felder ändern nichts am Musikgenerator):
  * XML: Wird in {@link XMLGenerator} verwendet.<br>
  * MIDI: Wird in {@link TrackFactory} verwendet.<br>
- * Musikgenerator: Wird bei der Komposition des Songs verwendet.
+ * Musikgenerator: Wird beim Komponieren des Songs verwendet.
  */
 public class SongConfig {
 
@@ -31,7 +32,7 @@ public class SongConfig {
 	 * Gibt einen relativen Wert an, mit welchem die Dauer berechnet wird.<br>
 	 * Ein 4tel = 1*division, 8tel = 1/2*division, halb = 2*division, ...<br>
 	 * Ist sozusagen die 'Schärfe' der Dauer, da keine float Werte für die Dauer erlaubt sind.
-	 * @category XML und MIDI
+	 * @category XML, MIDI und Musikgenerator
 	 */
 	public static final int measureDivision = 8;
 	
@@ -43,11 +44,10 @@ public class SongConfig {
 	private int fifth = 0;
 	
 	/**
-	 * Steht für die Taktart.<br>
-	 * Hat momentan noch keine Auswirkung im Musikgenerator, was noch geändert werden sollte.
-	 * @category XML und MIDI
+	 * Steht für die Taktart
+	 * @category XML, MIDI und Musikgenerator
 	 */
-	private int beats = 4, beatType = 4;//TODO Baue Taktart in Musikgenerator ein
+	private int beats = 4, beatType = 4;
 	
 	/**
 	 * Gibt den Notenschlüssel an.
@@ -70,7 +70,7 @@ public class SongConfig {
 	
 	/**
 	 * Die Anzahl an Akkorden pro Melodie.<br>
-	 * <code>chordNr * chordDuration</code> muss ein Vielfaches von 4 sein (Melodie muss n Takte lang sein)
+	 * <code>chordNr * chordDuration</code> muss ein Vielfaches von <code>beats sein (Melodie darf nicht mitten im Takt aufhören)
 	 * @category Musikgenerator
 	 */
 	private int chordNr = 4;
@@ -99,7 +99,7 @@ public class SongConfig {
 	 * Die Instrumente mit denen der Song abgespielt wird.<br>
 	 * Werden zwar mit in {@link Song} gespeichert, werden aber nicht in der Musik-Generierung benutzt.<br>
 	 * <code>melodyNr == instruments.length</code> muss True sein.
-	 * @category XML und MIDI
+	 * @category (XML, MIDI) und Musikgenerator
 	 */
 	private Instrument[] instruments = { new Piano(), new Flute(), new AcusticGuitar() };
 	
@@ -116,36 +116,43 @@ public class SongConfig {
 	 * Es werden nur positive Intervalle oder 0 verwendet.
 	 * @category Musikgenerator
 	 */
-	private ArrayList<PercentPair> intervals = new ArrayList<PercentPair>();
+	private ArrayList<PercentPair> intervals;
 	
 	/**
 	 * Die Wahrscheinlichkeiten für die Länge von Dauern (Im XML-/MIDI-Format).<br>
-	 * Die Summe muss 1 sein
+	 * Der Array ist nach Notenlängen sortiert, so dass die kürzeste Notenlänge in noteDurations[0] steht.<br>
+	 * Die Summe der Wahrscheinlichkeiten muss 1 sein
 	 * @category Musikgenerator
 	 */
-	private PercentPair[] noteDurations = { 
-			new PercentPair( SNote.EIGHTH, .3f ),
-			new PercentPair( SNote.QUARTER, .3f ),
-			new PercentPair( SNote.QUARTER_DOT, .15f ),
-			new PercentPair( SNote.HALF, .25f )
-	};
+	private ArrayList<PercentPair> noteDurations;
 	
+	/**
+	 * Die Wahrscheinlichkeit im Rhythmus statt eines Tones eine Pause einzubauen.
+	 * @category Musikgenerator
+	 */
+	private float restProbability = 0.1f;
 
 	public SongConfig( int chordNr, int repeats, int melodyNr, int chordDuration, SChord key, Instrument[] instruments ) {
 		this.chordNr = chordNr;
 		this.repeats = repeats;
 		this.melodyNr = melodyNr;
 		this.chordDuration = chordDuration;
+		if(chordDuration == 3){
+			beats = 3;
+			beatType = 3;
+		}
 		this.key = key;
 		fifth = ChordHelper.getCircleOfFifthPos(key);
 		if(instruments != null && instruments.length != 0){
 			this.instruments = instruments;
 		}
 		alterProbabilities();
+		printProbabilities();
 	}
 	
 	public SongConfig(){
 		alterProbabilities();
+		printProbabilities();
 	}
 	
 	/**
@@ -157,71 +164,55 @@ public class SongConfig {
 	 * </ul>
 	 */
 	private void alterProbabilities(){
-		Random rand = new Random();
+		Random rand = RandomHelper.getRandom();
 		
-//		###		setzt zufällige Intervall-Wahrscheinlichkeiten		###
-		float frstPercent = .2f;
-		float scndPercent = .35f;
-		float thrdPercent = .3f;
-		float ffthPercent = .15f;
-		
-		frstPercent = (rand.nextInt(30) + 5) / 100f;
-		scndPercent = (rand.nextInt(30) + 20) / 100f;
-		
-		//P(0)(Prime) + P(1)(Sekunde) muss mindestens 0.44 betragen und kann höchstens 0.85 sein
-		if(frstPercent + scndPercent < 44){
-			scndPercent = 0.44f - frstPercent;
+		alterIntervalProbabilities(rand);
+		alterDurationProbabilities(rand);
+	}
+	
+	private void alterIntervalProbabilities(Random rand){
+		Float[] intervalProbs = new Float[5];
+		intervalProbs[0] = (float) ((rand.nextInt(25) + 2.5) / 100);//( 15 +- 12.5 )%
+ 		intervalProbs[1] = (float) ((rand.nextInt(40) + 5.0) / 100);//( 25 +- 20 )%
+ 		intervalProbs[2] = (float) ((rand.nextInt(35) + 5.0) / 100);//( 22,5 +- 17,5 )%
+ 		intervalProbs[3] = (float) ((rand.nextInt(25) + 2.5) / 100);//( 15 +- 12.5 )%
+ 		intervalProbs[4] = (float) ((rand.nextInt(35) + 5.0) / 100);//( 22,5 +- 17,5 )%
+		float sum = 0;
+		for(float percent : intervalProbs){
+			sum += percent;
 		}
-		thrdPercent = (rand.nextInt(40) + 10) / 100f;
-		
-		//P(0) + P(1) + P(2)(Terz) darf maximal 0.98 betragen
-		if(thrdPercent + scndPercent + frstPercent > 0.98){
-			thrdPercent = 0.98f - scndPercent - frstPercent;
+		intervals = new ArrayList<PercentPair>();
+		for(int i = 0; i < intervalProbs.length; i++){
+			intervalProbs[i] /= sum;
+			intervals.add(new PercentPair(i, intervalProbs[i]));
 		}
-		//P(5)(Quinte) ergänzt die anderen Wahrscheinlichkeiten zu 1
-		ffthPercent = 1 - frstPercent - scndPercent - thrdPercent;
-		
-		//schreibt Ergebnisse in Konsole
-		System.out.println("Intervalle:");
-		System.out.println("Prime : " + frstPercent);
-		System.out.println("Sekunde : " + scndPercent);
-		System.out.println("Terz : " + thrdPercent);
-		System.out.println("Quinte : " + ffthPercent + "\n");
-		
-		intervals.add( new PercentPair(0, frstPercent));
-		intervals.add( new PercentPair(1, scndPercent));
-		intervals.add( new PercentPair(2, thrdPercent));
-		intervals.add( new PercentPair(4, ffthPercent));
-		
-		
-//		###			zufällige Dauer-Wahrscheinlichkeiten			###
-		
-		//P(4)(8tel) ist 10 bis 50 Prozent
-		noteDurations[0] = new PercentPair(noteDurations[0].getValue(), (rand.nextInt(30) + 15) / 100f);
-		
-		//P(8)(4tel ist 10 bis 50 Prozent
-		noteDurations[1] = new PercentPair(noteDurations[1].getValue(), (rand.nextInt(30) + 15)/ 100f);
-		
-		//P(4) + P(8) muss größer als 40 Prozent und kleiner als 70 Prozent sein
-		while( noteDurations[0].getPercent() + noteDurations[1].getPercent() < 0.4f ){
-			noteDurations[0] = new PercentPair(noteDurations[0].getValue(), noteDurations[0].getPercent() + 0.05f);
-			noteDurations[1] = new PercentPair(noteDurations[1].getValue(), noteDurations[1].getPercent() + 0.05f);
+	}
+	
+	private void alterDurationProbabilities(Random rand){
+		float eighthProb = (float) ((rand.nextInt(40) + 10.0) / 100);
+		float quarterProb = (float) ((rand.nextInt(40) + 10.0) / 100);
+		float quarterDotProb = (float) ((rand.nextInt(35) + 5.0) / 100);
+		float halfProb = (float) ((rand.nextInt(30) + 5.0) / 100);
+		float sum = eighthProb + quarterProb + quarterDotProb + halfProb;
+		eighthProb /= sum;
+		quarterProb /= sum;
+		quarterDotProb /= sum;
+		halfProb /= sum;
+		noteDurations = new ArrayList<PercentPair>();
+		noteDurations.add(new PercentPair(SNote.EIGHTH, eighthProb));
+		noteDurations.add(new PercentPair(SNote.QUARTER, quarterProb));
+		noteDurations.add(new PercentPair(SNote.QUARTER_DOT, quarterDotProb));
+		noteDurations.add(new PercentPair(SNote.HALF, halfProb));
 		}
-		while( noteDurations[0].getPercent() + noteDurations[1].getPercent() > 0.7f ){
-			noteDurations[0] = new PercentPair(noteDurations[0].getValue(), noteDurations[0].getPercent() - 0.05f);
-			noteDurations[1] = new PercentPair(noteDurations[1].getValue(), noteDurations[1].getPercent() - 0.05f);
+	
+	void printProbabilities(){
+		System.out.println("Intervalle: ");
+		for(PercentPair percent : intervals) {
+			System.out.println("Interval " + percent.getValue() + ": " + percent.getPercent());
 		}
-		
-		//P(12)(3/8tel) = 0.2 - (P(2) - P(6)); P(2) + P(6) + P(12) = 0.2
-		noteDurations[2] = new PercentPair(noteDurations[2].getValue(), (rand.nextInt(20) + 5) / 100f);
-		
-		//P(16)(halbe) ist 20 bis 40 Prozent
-		noteDurations[3] = new PercentPair(noteDurations[3].getValue(), 1f - noteDurations[0].getPercent() - noteDurations[1].getPercent() - noteDurations[2].getPercent());
-		
-		//schreibt Ergebnisse in Konsole
-		System.out.println("Notenlängen:");
-		for(int i = 0; i < noteDurations.length; i++){
-			System.out.println(noteDurations[i].getValue() + " : " + noteDurations[i].getPercent());
+		System.out.println("\nNotenlängen: ");
+		for(PercentPair percent : noteDurations) {
+			System.out.println("Dauer " + percent.getValue() + ": " + percent.getPercent());
 		}
 		System.out.println("");
 	}
@@ -284,6 +275,10 @@ public class SongConfig {
 	
 	public Instrument[] getInstruments() {
 		return instruments;
+	}
+	
+	public float getRestProbability(){
+		return restProbability;
 	}
 	
 //	public void readArgs() {
@@ -369,8 +364,8 @@ public class SongConfig {
 		return chordDuration;
 	}
 
-	public PercentPair[] getNoteDurations() {
-		return PercentPair.clone( noteDurations );
+	public ArrayList<PercentPair> getNoteDurations() {
+		return noteDurations;
 	}
 	
 	public ArrayList<PercentPair> getIntervals() {

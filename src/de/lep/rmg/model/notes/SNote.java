@@ -8,7 +8,7 @@ import de.lep.rmg.model.notes.helper.NoteHelper;
  * Gehört zum {@link Song}-Modell.
  *
  */
-public class SNote implements INote {
+public class SNote implements INote, IRealNote {
 
 	/**
 	 * Verschiedene Töne in Halbtonschritten.<br>
@@ -44,9 +44,9 @@ public class SNote implements INote {
 	
 	
 	public SNote( int tone, int octave, int duration ) {
-		this.tone = tone;
-		this.octave = octave;
-		this.duration = duration;
+		setTone( tone );
+		setOctave( octave );
+		setDuration( duration );
 	}
 	
 	/*#############################################################################
@@ -65,22 +65,49 @@ public class SNote implements INote {
 		return duration;
 	}
 	
+	
 	/*#############################################################################
 	 * 						SETTER
 	 *###########################################################################*/
 
 	public void setTone( int tone ) {
+		while(tone < 0)
+			tone += 12;
+		while(tone > 11)
+			tone -= 12;
 		this.tone = tone;
 	}
 
 	public void setOctave( int octave ) {
+		if(octave < 0)
+			octave = 0;
+//		if(octave > 11)
+//			octave = 11;
 		this.octave = octave;
 	}
 
 	public void setDuration( int duration ) {
+		if(duration <1)
+			duration = 1;
 		this.duration = duration;
 	}
-
+	
+	/**
+	 * Erhöht die Note um 'steps' Halbtonschritte und gleicht die interne Variable 'octave' entsprechend an.
+	 * @param steps - Anzahl der Halbtonschritte, um die die Note erhöht wird. Darf auch negativ sein.
+	 */
+	public void addStep( int steps ) {
+		this.tone += steps;
+		while ( tone < 0 ) {
+			this.octave -= 1;
+			this.tone += 12;
+		}
+		while ( tone >= 12 ) {
+			this.octave += 1;
+			this.tone -= 12;
+		}
+	}
+	
 	/**
 	 * Für Debug-Zwecke
 	 */
@@ -88,9 +115,17 @@ public class SNote implements INote {
 	public String toString() {
 		String stepStr = NoteHelper.getToneString( this );
 		if( NoteHelper.getAlter( this ) == -1 )
-			stepStr = "b";
+			stepStr += "b";
 		else if( NoteHelper.getAlter( this ) == 1 )
-			stepStr = "#";
+			stepStr += "#";
 		return "SNote [tone=" + tone + " (" + stepStr + "), octave=" + octave + ", duration=" + duration + "]";
 	}
+	
+	public SNote clone(){
+		return new SNote(this.tone, this.octave, this.duration);
+	}
+	
+	
+	
+
 }
