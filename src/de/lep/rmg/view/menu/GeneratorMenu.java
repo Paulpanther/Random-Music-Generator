@@ -51,7 +51,8 @@ public class GeneratorMenu extends JMenu {
 			for(ISongChangeObserver sco : songChangeObserverList)
 				genPanel.addSongChangeObserver(sco);
 			window.add(genPanel, 0);
-			
+
+			window.pack();
 			window.repaint();
 		}
 		

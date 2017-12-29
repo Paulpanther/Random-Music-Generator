@@ -12,3 +12,8 @@ bin
 .classpath
 .project
 res
+
+# Intellij IDEA
+/.idea/
+*.iml
+/out/
